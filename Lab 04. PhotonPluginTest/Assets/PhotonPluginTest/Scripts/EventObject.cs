@@ -14,7 +14,7 @@ public class EventObject : Photon.PunBehaviour
     public void DoRaiseEvent()
     {
         byte evCode = 1;
-        //        byte[] content = new byte[] { 3, 6, 9 };
+        //byte[] content = 
         bool reliable = true;
         PhotonNetwork.RaiseEvent( evCode, null, reliable, null );
     }

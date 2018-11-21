@@ -6,11 +6,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Photon.Hive;
 using Photon.Hive.Plugin;
+using MySql.Data;
+using MySql.Data.MySqlClient;
 
 namespace TestPlugin
 {
     public class RaiseEventTestPlugin : PluginBase
     {
+        string connStr;
+        MySqlConnection conn;
+
         public string ServerString
         {
             get;
@@ -27,6 +32,9 @@ namespace TestPlugin
             UseStrictMode = true;
             ServerString = "ServerMessage";
             CallsCount = 0;
+
+            // ----- Connects to MySQL data base
+            ConnectToMySQL();
         }
 
         public override string Name
@@ -49,8 +57,13 @@ namespace TestPlugin
                 return;
             }
 
-            if (info.Request.EvCode == 1)
+            if (1 == info.Request.EvCode)
             {
+                string playerName = Encoding.Default.GetString((byte[])info.Request.Data);
+                string sql = "INSERT INTO users (name, date_created) VALUES ('" + playerName + "', now())";
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+
                 ++CallsCount;
                 int cnt = CallsCount;
                 string ReturnMessage = info.Nickname + " clicked the button. Now the count is " + cnt.ToString();
@@ -61,6 +74,26 @@ namespace TestPlugin
                                           data: new Dictionary<byte, object>() { { 245, ReturnMessage } },
                                           evCode: info.Request.EvCode, cacheOp: 0);
             }
+        }
+
+        public void ConnectToMySQL()
+        {
+            // Connect to MySQL
+            connStr = "server=localhost;user=root;database=photon;port=3306;password=qwerty";
+            conn = new MySqlConnection(connStr);
+            try
+            {
+                conn.Open();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        public void DisconnectFromMySQL()
+        {
+            conn.Close();
         }
     }
 }
