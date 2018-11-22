@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Text;
 using UnityEngine;
 
 public class EventObject : Photon.PunBehaviour
@@ -14,9 +13,9 @@ public class EventObject : Photon.PunBehaviour
     public void DoRaiseEvent()
     {
         byte evCode = 1;
-        //byte[] content = 
+        byte[] content = Encoding.UTF8.GetBytes(PhotonNetwork.playerName);
         bool reliable = true;
-        PhotonNetwork.RaiseEvent( evCode, null, reliable, null );
+        PhotonNetwork.RaiseEvent( evCode, content, reliable, null );
     }
 
     private void OnEvent( byte eventCode, object content, int senderID )
