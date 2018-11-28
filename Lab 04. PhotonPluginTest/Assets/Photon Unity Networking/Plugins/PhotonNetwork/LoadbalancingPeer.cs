@@ -142,7 +142,7 @@ using ExitGames.Client.Photon;
             if (roomOptions.CleanupCacheOnLeave)
             {
                 flags = flags | (int)RoomOptionBit.DeleteCacheOnLeave;
-                gameProperties[GamePropertyKey.CleanupCacheOnLeave] = false;  			// this is only informational for the clients which join
+                gameProperties[GamePropertyKey.CleanupCacheOnLeave] = true;  			// this is only informational for the clients which join
             }
 
             // in PUN v1.88 and PUN 2, CheckUserOnJoin is set by default:
