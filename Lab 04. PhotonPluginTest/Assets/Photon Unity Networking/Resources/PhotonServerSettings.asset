@@ -3,12 +3,12 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9f3758f8f58fdef43803eb9be1df0608, type: 3}
+  m_Script: {fileID: 11500000, guid: 3b51608f6a3a4584d87dc9aecf104cfd, type: 3}
   m_Name: PhotonServerSettings
   m_EditorClassIdentifier: 
   AppID: 
@@ -18,7 +18,7 @@ MonoBehaviour:
   PreferredRegion: 0
   EnabledRegions: -1
   Protocol: 0
-  ServerAddress: 10.211.55.5
+  ServerAddress: 192.168.1.39
   ServerPort: 5055
   VoiceServerPort: 5055
   JoinLobby: 0
@@ -41,5 +41,6 @@ MonoBehaviour:
   - PunRespawn
   - RequestForPickupItems
   - RequestForPickupTimes
+  - SendChatMessage
   - TaggedPlayer
   DisableAutoOpenWizard: 1
