@@ -15,7 +15,7 @@ namespace TestPlugin
     {
         readonly string connStr = "server=localhost;user=root;database=photon;port=3306;password=qwerty";
         MySqlConnection conn;
-        string recvMessage;
+        string message;
 
         public string ServerString { get; private set; }
         public int CallsCount { get; private set; }
@@ -26,8 +26,8 @@ namespace TestPlugin
             ServerString = "ServerMessage";
             CallsCount = 0;
 
-            // ----- Connects to MySQL data base
-            ConnectToMySQL();
+            //// ----- Connects to MySQL data base
+            //ConnectToMySQL();
         }
 
         public override string Name
@@ -50,57 +50,64 @@ namespace TestPlugin
                 return;
             }
 
-            // to insert into database
-            if (1 == info.Request.EvCode)
-            {
-                string playerName = Encoding.Default.GetString((byte[])info.Request.Data);
-                string sql = "INSERT INTO user (name, date_created) VALUES ('" + playerName + "', now())";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.ExecuteNonQuery();
+            ConnectToMySQL();
 
-                ++CallsCount;
-                int cnt = CallsCount;
-                string ReturnMessage = info.Nickname + " clicked the button. Now the count is " + cnt.ToString();
+            if((byte)EvCode.LOGIN == info.Request.EvCode)
+            {
+                // check if both username and password is right
+                message = Encoding.Default.GetString((byte[])info.Request.Data);
+
+                // extract the message
+                string recvUsername = GetStringDataFromMessage("Username");
+                string recvPassword = GetStringDataFromMessage("Password");
+
+                string sql = "SELECT * FROM account WHERE username = " + recvUsername;
+                MySqlCommand cmd = new MySqlCommand(sql, conn);
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                string username = null; string password = null;
+                while (rdr.Read())
+                {
+                    username = rdr.GetString(1);
+                    password = rdr.GetString(2);
+
+                }
+                rdr.Close();
+
+                string returnMessage = "Successful";
+                if (username == null || password != recvPassword)
+                    returnMessage = "Unsuccessful";
 
                 // returns the message to the client
                 PluginHost.BroadcastEvent(target: ReciverGroup.All,
-                                          senderActor: 0,
-                                          targetGroup: 0,
-                                          data: new Dictionary<byte, object>() { { 245, ReturnMessage } },
-                                          evCode: info.Request.EvCode, 
-                                          cacheOp: 0);
+                                      senderActor: 0,
+                                      targetGroup: 0,
+                                      data: new Dictionary<byte, object>() { { 245, returnMessage } },
+                                      evCode: info.Request.EvCode,
+                                      cacheOp: 0);
             }
-            // testing with viking client
-            else if (2 == info.Request.EvCode)
-            {
-                recvMessage = Encoding.Default.GetString((byte[])info.Request.Data);
 
-                string playerName = GetStringDataFromMessage("PlayerName");
-                string playerPassword = GetStringDataFromMessage("Password");
-
-                string sql = "INSERT INTO viking (name, password, date_created) VALUES ('" + playerName + "', '" + playerPassword + "', now())";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                cmd.ExecuteNonQuery();
-            }
+            DisconnectFromMySQL();
         }
 
         string GetStringDataFromMessage(string returnData)
         {
             string temp = returnData + "=";
-            int pFrom = recvMessage.IndexOf(temp) + temp.Length;
-            int pTo = recvMessage.LastIndexOf(",");
+            int pFrom = message.IndexOf(temp) + temp.Length;
+            int pTo = message.LastIndexOf(",");
 
             // there's no comma at the end
             if (pTo - pFrom < 0)
             {
-                pFrom = recvMessage.LastIndexOf(temp) + temp.Length;
-                return recvMessage.Substring(pFrom);
+                pFrom = message.LastIndexOf(temp) + temp.Length;
+                return message.Substring(pFrom);
             }
 
-            return recvMessage.Substring(pFrom, pTo - pFrom);
+            return message.Substring(pFrom, pTo - pFrom);
         }
 
-        public void ConnectToMySQL()
+        // ----- Open connection to 
+        void ConnectToMySQL()
         {
             // Connect to MySQL
             conn = new MySqlConnection(connStr);
@@ -114,9 +121,43 @@ namespace TestPlugin
             }
         }
 
-        public void DisconnectFromMySQL()
+        // ----- Close MySQL connection
+        void DisconnectFromMySQL()
         {
             conn.Close();
         }
+
+        //// to insert into database
+        //if (1 == info.Request.EvCode)
+        //{
+        //    string playerName = Encoding.Default.GetString((byte[])info.Request.Data);
+        //    string sql = "INSERT INTO user (name, date_created) VALUES ('" + playerName + "', now())";
+        //    MySqlCommand cmd = new MySqlCommand(sql, conn);
+        //    cmd.ExecuteNonQuery();
+
+        //    ++CallsCount;
+        //    int cnt = CallsCount;
+        //    string ReturnMessage = info.Nickname + " clicked the button. Now the count is " + cnt.ToString();
+
+        //    // returns the message to the client
+        //    PluginHost.BroadcastEvent(target: ReciverGroup.All,
+        //                              senderActor: 0,
+        //                              targetGroup: 0,
+        //                              data: new Dictionary<byte, object>() { { 245, ReturnMessage } },
+        //                              evCode: info.Request.EvCode, 
+        //                              cacheOp: 0);
+        //}
+        //// testing with viking client
+        //else if ((byte)EvCode.LOGIN == info.Request.EvCode)
+        //{
+        //    message = Encoding.Default.GetString((byte[])info.Request.Data);
+
+        //    string playerName = GetStringDataFromMessage("PlayerName");
+        //    string playerPassword = GetStringDataFromMessage("Password");
+
+        //    string sql = "INSERT INTO viking (name, password, date_created) VALUES ('" + playerName + "', '" + playerPassword + "', now())";
+        //    MySqlCommand cmd = new MySqlCommand(sql, conn);
+        //    cmd.ExecuteNonQuery();
+        //}
     }
 }
