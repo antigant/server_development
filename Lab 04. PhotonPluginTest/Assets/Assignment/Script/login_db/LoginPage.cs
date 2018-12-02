@@ -78,6 +78,16 @@ public class LoginPage : Photon.PunBehaviour
         // only receiving message from server if login password/username is incorrect/don't exist in db
         if ((eventCode == (byte)EvCode.LOGIN) && (senderID <= 0))
             message = (string)content;
+        // Successful
+        if(message[0] == 'S')
+        {
+            // set up relevant data for the player
+        }
+        // Unsuccesful
+        else if(message[0] == 'U')
+        {
+            // inform the player that the username/password is incorrect
+        }
     }
 
     // brings the player to the registration screen

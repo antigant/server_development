@@ -61,20 +61,20 @@ namespace TestPlugin
                 string recvUsername = GetStringDataFromMessage("Username");
                 string recvPassword = GetStringDataFromMessage("Password");
 
-                string sql = "SELECT * FROM account WHERE username = " + recvUsername;
+                string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
-                string username = null; string password = null;
+                int accountID = 0; string username = null; string password = null;
                 while (rdr.Read())
                 {
+                    accountID = rdr.GetInt32(0);
                     username = rdr.GetString(1);
                     password = rdr.GetString(2);
-
                 }
                 rdr.Close();
 
-                string returnMessage = "Successful";
+                string returnMessage = "Successful, AccountID=" + accountID;
                 if (username == null || password != recvPassword)
                     returnMessage = "Unsuccessful";
 
