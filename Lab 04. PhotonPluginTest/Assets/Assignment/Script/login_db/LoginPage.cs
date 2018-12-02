@@ -4,8 +4,8 @@ public class LoginPage : Photon.PunBehaviour
 {
     string username;
     string password;
-    // message from server
-    string message;
+    // display the message from server
+    string displayMessage;
 
     void Awake()
     {
@@ -75,18 +75,23 @@ public class LoginPage : Photon.PunBehaviour
     // Use this to receive message from server
     void LoginReceive(byte eventCode, object content, int senderID)
     {
-        // only receiving message from server if login password/username is incorrect/don't exist in db
+        string message = "";
         if ((eventCode == (byte)EvCode.LOGIN) && (senderID <= 0))
             message = (string)content;
         // Successful
         if(message[0] == 'S')
         {
             // set up relevant data for the player
+            int accountID = System.Convert.ToInt32(GeneralFunction.GetStringDataFromMessage(message, "AccountID"));
+            string playerName = GeneralFunction.GetStringDataFromMessage(message, "PlayerName");
+            // Init the player
+            Player.GetInstance(accountID).SetPlayerName(playerName);
         }
         // Unsuccesful
         else if(message[0] == 'U')
         {
             // inform the player that the username/password is incorrect
+            displayMessage = GeneralFunction.GetStringDataFromMessage(message, "Message");
         }
     }
 

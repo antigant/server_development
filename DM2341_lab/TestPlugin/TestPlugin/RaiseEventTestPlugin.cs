@@ -61,6 +61,7 @@ namespace TestPlugin
                 string recvUsername = GetStringDataFromMessage("Username");
                 string recvPassword = GetStringDataFromMessage("Password");
 
+                // Check if username is in database
                 string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
                 MySqlCommand cmd = new MySqlCommand(sql, conn);
                 MySqlDataReader rdr = cmd.ExecuteReader();
@@ -74,9 +75,21 @@ namespace TestPlugin
                 }
                 rdr.Close();
 
-                string returnMessage = "Successful, AccountID=" + accountID;
+                string returnMessage = "";
                 if (username == null || password != recvPassword)
-                    returnMessage = "Unsuccessful";
+                    returnMessage = "Unsuccessful, Message=Incorrect username/password";
+                else
+                {
+                    // get player name
+                    sql = "SELECT player_name FROM player WHERE account_id = '" + accountID + "'";
+                    cmd.CommandText = sql;
+                    rdr = cmd.ExecuteReader();
+                    string playerName = "";
+                    while (rdr.Read())
+                        playerName = rdr.GetString(1);
+
+                    returnMessage = "Successful, AccountID=" + accountID + "PlayerName=" + playerName;
+                }
 
                 // returns the message to the client
                 PluginHost.BroadcastEvent(target: ReciverGroup.All,
