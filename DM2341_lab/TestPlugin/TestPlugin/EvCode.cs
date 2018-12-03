@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TestPlugin
+﻿namespace TestPlugin
 {
     public enum EvCode
     {
         LOGIN = 0,
         REGISTRATION,
+
+        PHOTON_TEST = 100,
     }
 }

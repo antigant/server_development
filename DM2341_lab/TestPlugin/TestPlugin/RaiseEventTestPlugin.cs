@@ -52,55 +52,93 @@ namespace TestPlugin
 
             ConnectToMySQL();
 
-            if((byte)EvCode.LOGIN == info.Request.EvCode)
+            switch (info.Request.EvCode)
             {
-                // check if both username and password is right
-                message = Encoding.Default.GetString((byte[])info.Request.Data);
+                case (byte)EvCode.LOGIN:
+                    {
+                        Login(info);
+                        break;
+                    }
+                case (byte)EvCode.REGISTRATION:
+                    {
+                        Registration(info);
+                        break;
+                    }
+                case (byte)EvCode.PHOTON_TEST:
+                    {
+                        Photon_Test(info);
+                        break;
+                    }
 
-                // extract the message
-                string recvUsername = GetStringDataFromMessage("Username");
-                string recvPassword = GetStringDataFromMessage("Password");
-
-                // Check if username is in database
-                string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
-                MySqlCommand cmd = new MySqlCommand(sql, conn);
-                MySqlDataReader rdr = cmd.ExecuteReader();
-
-                int accountID = 0; string username = null; string password = null;
-                while (rdr.Read())
-                {
-                    accountID = rdr.GetInt32(0);
-                    username = rdr.GetString(1);
-                    password = rdr.GetString(2);
-                }
-                rdr.Close();
-
-                string returnMessage = "";
-                if (username == null || password != recvPassword)
-                    returnMessage = "Unsuccessful, Message=Incorrect username/password";
-                else
-                {
-                    // get player name
-                    sql = "SELECT player_name FROM player WHERE account_id = '" + accountID + "'";
-                    cmd.CommandText = sql;
-                    rdr = cmd.ExecuteReader();
-                    string playerName = "";
-                    while (rdr.Read())
-                        playerName = rdr.GetString(1);
-
-                    returnMessage = "Successful, AccountID=" + accountID + "PlayerName=" + playerName;
-                }
-
-                // returns the message to the client
-                PluginHost.BroadcastEvent(target: ReciverGroup.All,
-                                      senderActor: 0,
-                                      targetGroup: 0,
-                                      data: new Dictionary<byte, object>() { { 245, returnMessage } },
-                                      evCode: info.Request.EvCode,
-                                      cacheOp: 0);
+                default:
+                    break;
             }
 
             DisconnectFromMySQL();
+        }
+
+        void Photon_Test(IRaiseEventCallInfo info)
+        {
+            int[] test = { 100, 11238 };
+
+            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } }, 
+                senderActor: 0,
+                evCode:info.Request.EvCode, 
+                data: new Dictionary<byte, object>() { { 245, test } }, 
+                cacheOp: 0);
+        }
+
+        void Login(IRaiseEventCallInfo info)
+        {
+            // check if both username and password is right
+            message = Encoding.Default.GetString((byte[])info.Request.Data);
+
+            // extract the message
+            string recvUsername = GetStringDataFromMessage("Username");
+            string recvPassword = GetStringDataFromMessage("Password");
+
+            // Check if username is in database
+            string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
+            MySqlCommand cmd = new MySqlCommand(sql, conn);
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            int accountID = 0; string username = null; string password = null;
+            while (rdr.Read())
+            {
+                accountID = rdr.GetInt32(0);
+                username = rdr.GetString(1);
+                password = rdr.GetString(2);
+            }
+            rdr.Close();
+
+            string returnMessage = "";
+            if (username == null || password != recvPassword)
+                returnMessage = "Unsuccessful, Message=Incorrect username/password";
+            else
+            {
+                // get player name
+                sql = "SELECT player_name FROM player WHERE account_id = '" + accountID + "'";
+                cmd.CommandText = sql;
+                rdr = cmd.ExecuteReader();
+                string playerName = "";
+                while (rdr.Read())
+                    playerName = rdr.GetString(1);
+
+                returnMessage = "Successful, AccountID=" + accountID + "PlayerName=" + playerName;
+            }
+
+            // returns the message to the client
+            PluginHost.BroadcastEvent(target: (byte)info.ActorNr,
+                                  senderActor: 0,
+                                  targetGroup: 0,
+                                  data: new Dictionary<byte, object>() { { 245, returnMessage } },
+                                  evCode: info.Request.EvCode,
+                                  cacheOp: 0);
+        }
+
+        void Registration(IRaiseEventCallInfo info)
+        {
+            message = Encoding.Default.GetString((byte[])info.Request.Data);
         }
 
         string GetStringDataFromMessage(string returnData)
@@ -137,6 +175,8 @@ namespace TestPlugin
         // ----- Close MySQL connection
         void DisconnectFromMySQL()
         {
+            // reset data
+            message = "";
             conn.Close();
         }
 

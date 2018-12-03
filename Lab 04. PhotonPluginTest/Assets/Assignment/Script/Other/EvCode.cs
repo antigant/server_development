@@ -2,4 +2,6 @@
 {
     LOGIN = 0,
     REGISTRATION,
+
+    PHOTON_TEST = 100,
 }
