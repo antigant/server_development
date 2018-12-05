@@ -13,7 +13,8 @@ namespace CustomPlugin
         [SerializeField] protected int itemNameID; // id of the item name
 
         // game object of the item (looks etc), can attach relevant scripts to it too
-        public GameObject itemObj { get; set; }
+        public GameObject Obj { get; set; }
+        public string Name { get; set; }
 
         public int ItemID { get { return itemID; } }
         public int ItemNameID { get { return itemNameID; } }
@@ -24,6 +25,15 @@ namespace CustomPlugin
             itemNameID = nameID;
         }
 
+        public static void RegisterServer()
+        {
+            Protocol.TryRegisterType(typeof(Item), (byte)'A', SerializeItem, DeserializeItem);
+        }
+
+        public static void RegisterClient()
+        {
+            PhotonPeer.RegisterType(typeof(Item), (byte)'A', SerializeItem, DeserializeItem);
+        }
 
         public static short SerializeItem(StreamBuffer outStream, object customObject)
         {
@@ -42,6 +52,25 @@ namespace CustomPlugin
             }
 
             return (short)memItemInfo.Length;
+        }
+
+        public static object DeserializeItem(StreamBuffer inStream, short length)
+        {
+            // Temp holders for each member in Item
+            int itemID = 0;
+            int itemNameID = 0;
+
+            lock(memItemInfo)
+            {
+                int index = 0; // byte stream strating index
+
+                // Deserialize each value in the same order when serializing
+                Protocol.Deserialize(out itemID, memItemInfo, ref index);
+                Protocol.Deserialize(out itemNameID, memItemInfo, ref index);
+            }
+
+            // Return new instance of Item with the relevant data
+            return new Item(itemID, itemNameID);
         }
     }
 }

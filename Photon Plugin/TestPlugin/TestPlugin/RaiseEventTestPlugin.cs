@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Photon.Hive.Plugin;
 using MySql.Data.MySqlClient;
+using CustomPlugin;
 
 namespace TestPlugin
 {
@@ -10,7 +11,6 @@ namespace TestPlugin
     {
         readonly string connStr = "server=localhost;user=root;database=photon;port=3306;password=qwerty";
         MySqlConnection conn;
-        string message;
 
         public string ServerString { get; private set; }
         public int CallsCount { get; private set; }
@@ -74,9 +74,8 @@ namespace TestPlugin
 
         void Photon_Test(IRaiseEventCallInfo info)
         {
-            int[] test = { 100, 11238 };
-            //Item test = new Item(513);
-            //test.SetItemName("Test Item!");
+            //int[] test = { 100, 11238 };
+            Item test = new Item(513, 1);
 
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } }, 
                 senderActor: 0,
@@ -88,11 +87,11 @@ namespace TestPlugin
         void Login(IRaiseEventCallInfo info)
         {
             // check if both username and password is right
-            message = Encoding.Default.GetString((byte[])info.Request.Data);
+            string message = Encoding.Default.GetString((byte[])info.Request.Data);
 
             // extract the message
-            string recvUsername = GetStringDataFromMessage("Username");
-            string recvPassword = GetStringDataFromMessage("Password");
+            string recvUsername = General.GetStringDataFromMessage(message, "Username");
+            string recvPassword = General.GetStringDataFromMessage(message, "Password");
 
             // Check if username is in database
             string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
@@ -135,24 +134,24 @@ namespace TestPlugin
 
         void Registration(IRaiseEventCallInfo info)
         {
-            message = Encoding.Default.GetString((byte[])info.Request.Data);
+            string message = Encoding.Default.GetString((byte[])info.Request.Data);
         }
 
-        string GetStringDataFromMessage(string returnData)
-        {
-            string temp = returnData + "=";
-            int pFrom = message.IndexOf(temp) + temp.Length;
-            int pTo = message.LastIndexOf(",");
+        //string GetStringDataFromMessage(string returnData)
+        //{
+        //    string temp = returnData + "=";
+        //    int pFrom = message.IndexOf(temp) + temp.Length;
+        //    int pTo = message.LastIndexOf(",");
 
-            // there's no comma at the end
-            if (pTo - pFrom < 0)
-            {
-                pFrom = message.LastIndexOf(temp) + temp.Length;
-                return message.Substring(pFrom);
-            }
+        //    // there's no comma at the end
+        //    if (pTo - pFrom < 0)
+        //    {
+        //        pFrom = message.LastIndexOf(temp) + temp.Length;
+        //        return message.Substring(pFrom);
+        //    }
 
-            return message.Substring(pFrom, pTo - pFrom);
-        }
+        //    return message.Substring(pFrom, pTo - pFrom);
+        //}
 
         // ----- Open connection to 
         void ConnectToMySQL()
@@ -173,7 +172,6 @@ namespace TestPlugin
         void DisconnectFromMySQL()
         {
             // reset data
-            message = "";
             conn.Close();
         }
 

@@ -13,6 +13,8 @@ namespace TestPlugin
         {
             var plugin = new RaiseEventTestPlugin();
 
+            CustomPlugin.RegisterCustomType.RegisterServer();
+
             if (plugin.SetupInstance(gameHost, config, out errorMsg))
                 return plugin;
             return null;

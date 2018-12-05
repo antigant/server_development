@@ -4,7 +4,7 @@ using CustomPlugin;
 public class ReceiveArray : Photon.PunBehaviour
 {
     int[] testArray = { 0, 0 };
-    Item testItem = new Item(15);
+    Item testItem = new Item(15, 10);
 
     void Awake()
     {
@@ -12,7 +12,6 @@ public class ReceiveArray : Photon.PunBehaviour
         //    PhotonNetwork.ConnectUsingSettings("v1.0");
 
         PhotonNetwork.OnEventCall += TestReceive;
-        testItem.SetItemName("Nothing");
     }
 
     void OnGUI()
@@ -35,7 +34,7 @@ public class ReceiveArray : Photon.PunBehaviour
         }
 
         //GUILayout.Label(string.Format("Element in array {0}, {1}", testArray[0], testArray[1]));
-        GUILayout.Label(string.Format("Item ID: {0}, Item Name: {1}", testItem.GetItemID(), testItem.GetItemName()));
+        GUILayout.Label(string.Format("Item ID: {0}, Item Name: {1}", testItem.ItemID, testItem.ItemNameID));
     }
 
     public void Test()

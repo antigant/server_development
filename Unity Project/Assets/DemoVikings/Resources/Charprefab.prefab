@@ -525,7 +525,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100006}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 37.500957, y: 1.0284578, z: 30.477028}
+  m_LocalPosition: {x: 51.09559, y: 1.3765254, z: 44.22058}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400060}
@@ -1192,6 +1192,7 @@ MonoBehaviour:
   mouseTurnSpeed: 0.3
   jumpSpeed: 6
   groundLayers:
+    serializedVersion: 2
     m_Bits: 4294967295
   groundedCheckOffset: 0.7
   showGizmos: 1
@@ -1214,8 +1215,10 @@ MonoBehaviour:
   target: {fileID: 13600000}
   camera: {fileID: 0}
   obstacleLayers:
+    serializedVersion: 2
     m_Bits: 256
   groundLayers:
+    serializedVersion: 2
     m_Bits: 256
   groundedCheckOffset: 0.7
   rotationUpdateSpeed: 60

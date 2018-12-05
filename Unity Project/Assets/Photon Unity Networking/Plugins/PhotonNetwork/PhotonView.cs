@@ -267,7 +267,7 @@ public class PhotonView : Photon.MonoBehaviour
         {
             // registration might be too late when some script (on this GO) searches this view BUT GetPhotonView() can search ALL in that case
             PhotonNetwork.networkingPeer.RegisterPhotonView(this);
-            this.instantiationDataField = PhotonNetwork.networkingPeer.FetchInstantiationData(this.instantiationId);
+            this.instantiationDataField = PhotonNetwork.networkingPeer.FetchInstantiationData(this.instantiationId);  
         }
 
         this.didAwake = true;

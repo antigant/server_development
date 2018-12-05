@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CustomPlugin
 {
-    class General
+    public class General
     {
         public const int INTEGER_BYTE = 1; // Unsigned (0 to 255)
         public const int INTEGER_SBYTE = 2; // Signed (-128 to 127)
