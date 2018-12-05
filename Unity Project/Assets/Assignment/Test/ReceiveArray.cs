@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using CustomPlugin;
 
 public class ReceiveArray : Photon.PunBehaviour
 {
     int[] testArray = { 0, 0 };
+    Item testItem = new Item(15);
 
     void Awake()
     {
@@ -10,6 +12,7 @@ public class ReceiveArray : Photon.PunBehaviour
         //    PhotonNetwork.ConnectUsingSettings("v1.0");
 
         PhotonNetwork.OnEventCall += TestReceive;
+        testItem.SetItemName("Nothing");
     }
 
     void OnGUI()
@@ -22,12 +25,17 @@ public class ReceiveArray : Photon.PunBehaviour
 
         //if (PhotonNetwork.room == null) return; //Only display this GUI when inside a room
 
-        if (GUILayout.Button("Test receive array"))
+        //if (GUILayout.Button("Test receive array"))
+        //{
+        //    Test();
+        //}
+        if (GUILayout.Button("Test custom class"))
         {
             Test();
         }
 
-        GUILayout.Label(string.Format("Element in array {0}, {1}", testArray[0], testArray[1]));
+        //GUILayout.Label(string.Format("Element in array {0}, {1}", testArray[0], testArray[1]));
+        GUILayout.Label(string.Format("Item ID: {0}, Item Name: {1}", testItem.GetItemID(), testItem.GetItemName()));
     }
 
     public void Test()
@@ -39,7 +47,8 @@ public class ReceiveArray : Photon.PunBehaviour
 
     void TestReceive(byte eventCode, object content, int senderID)
     {
-        testArray = (int[])content;
+        //testArray = (int[])content;
+        testItem = (Item)content;
     }
 
     void ShowConnectingGUI()

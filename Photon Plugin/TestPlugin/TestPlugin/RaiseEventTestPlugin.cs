@@ -1,12 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Photon.Hive;
 using Photon.Hive.Plugin;
-using MySql.Data;
 using MySql.Data.MySqlClient;
 
 namespace TestPlugin
@@ -80,6 +75,8 @@ namespace TestPlugin
         void Photon_Test(IRaiseEventCallInfo info)
         {
             int[] test = { 100, 11238 };
+            //Item test = new Item(513);
+            //test.SetItemName("Test Item!");
 
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } }, 
                 senderActor: 0,

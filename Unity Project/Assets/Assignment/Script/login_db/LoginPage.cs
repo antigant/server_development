@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ExitGames;
 
 public class LoginPage : Photon.PunBehaviour
 {
