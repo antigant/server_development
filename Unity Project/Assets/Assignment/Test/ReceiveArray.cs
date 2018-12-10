@@ -4,7 +4,7 @@ using CustomPlugin;
 public class ReceiveArray : Photon.PunBehaviour
 {
     int[] testArray = { 0, 0 };
-    Item testItem = new Item(15, 10);
+    Item testItem = new Item(15, "nameless");
 
     void Awake()
     {
@@ -34,7 +34,7 @@ public class ReceiveArray : Photon.PunBehaviour
         }
 
         //GUILayout.Label(string.Format("Element in array {0}, {1}", testArray[0], testArray[1]));
-        GUILayout.Label(string.Format("Item ID: {0}, Item Name: {1}", testItem.ItemID, testItem.ItemNameID));
+        GUILayout.Label(string.Format("Item ID: {0}, Item Name: {1}", testItem.ItemID, testItem.Name));
     }
 
     public void Test()
@@ -42,12 +42,14 @@ public class ReceiveArray : Photon.PunBehaviour
         byte evCode = (byte)EvCode.PHOTON_TEST;
         bool reliable = true;
         PhotonNetwork.RaiseEvent(evCode, null, reliable, null);
+
+        Debug.Log("Still works");
     }
 
     void TestReceive(byte eventCode, object content, int senderID)
     {
         //testArray = (int[])content;
-        testItem = (Item)content;
+        testItem = Item.Deserialize((byte[])content) as Item;
     }
 
     void ShowConnectingGUI()

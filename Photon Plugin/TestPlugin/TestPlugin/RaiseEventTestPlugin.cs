@@ -33,6 +33,12 @@ namespace TestPlugin
             }
         }
 
+        public override bool SetupInstance(IPluginHost host, Dictionary<string, string> config, out string errorMsg)
+        {
+            host.TryRegisterType(typeof(Item), (byte)'A', Item.Serialize, Item.Deserialize);
+            return base.SetupInstance(host, config, out errorMsg);
+        }
+
         public override void OnRaiseEvent(IRaiseEventCallInfo info)
         {
             try
@@ -75,23 +81,26 @@ namespace TestPlugin
         void Photon_Test(IRaiseEventCallInfo info)
         {
             //int[] test = { 100, 11238 };
-            Item test = new Item(513, 1);
+            Item test = new Item(513, "new test item");
 
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } }, 
                 senderActor: 0,
                 evCode:info.Request.EvCode, 
-                data: new Dictionary<byte, object>() { { 245, test } }, 
-                cacheOp: 0);
+                data: new Dictionary<byte, object>() { { 245, test }, { 254, 0 } }, 
+                cacheOp: CacheOperations.DoNotCache);
         }
 
         void Login(IRaiseEventCallInfo info)
         {
             // check if both username and password is right
-            string message = Encoding.Default.GetString((byte[])info.Request.Data);
+            string[] message = (string[])info.Request.Data;
 
             // extract the message
-            string recvUsername = General.GetStringDataFromMessage(message, "Username");
-            string recvPassword = General.GetStringDataFromMessage(message, "Password");
+            //string recvUsername = General.GetStringDataFromMessage(message, "Username");
+            //string recvPassword = General.GetStringDataFromMessage(message, "Password");
+
+            string recvUsername = message[0];
+            string recvPassword = message[1];
 
             // Check if username is in database
             string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
@@ -134,24 +143,10 @@ namespace TestPlugin
 
         void Registration(IRaiseEventCallInfo info)
         {
-            string message = Encoding.Default.GetString((byte[])info.Request.Data);
+            string[] message = (string[])info.Request.Data;
+
+
         }
-
-        //string GetStringDataFromMessage(string returnData)
-        //{
-        //    string temp = returnData + "=";
-        //    int pFrom = message.IndexOf(temp) + temp.Length;
-        //    int pTo = message.LastIndexOf(",");
-
-        //    // there's no comma at the end
-        //    if (pTo - pFrom < 0)
-        //    {
-        //        pFrom = message.LastIndexOf(temp) + temp.Length;
-        //        return message.Substring(pFrom);
-        //    }
-
-        //    return message.Substring(pFrom, pTo - pFrom);
-        //}
 
         // ----- Open connection to 
         void ConnectToMySQL()
@@ -174,38 +169,54 @@ namespace TestPlugin
             // reset data
             conn.Close();
         }
-
-        //// to insert into database
-        //if (1 == info.Request.EvCode)
-        //{
-        //    string playerName = Encoding.Default.GetString((byte[])info.Request.Data);
-        //    string sql = "INSERT INTO user (name, date_created) VALUES ('" + playerName + "', now())";
-        //    MySqlCommand cmd = new MySqlCommand(sql, conn);
-        //    cmd.ExecuteNonQuery();
-
-        //    ++CallsCount;
-        //    int cnt = CallsCount;
-        //    string ReturnMessage = info.Nickname + " clicked the button. Now the count is " + cnt.ToString();
-
-        //    // returns the message to the client
-        //    PluginHost.BroadcastEvent(target: ReciverGroup.All,
-        //                              senderActor: 0,
-        //                              targetGroup: 0,
-        //                              data: new Dictionary<byte, object>() { { 245, ReturnMessage } },
-        //                              evCode: info.Request.EvCode, 
-        //                              cacheOp: 0);
-        //}
-        //// testing with viking client
-        //else if ((byte)EvCode.LOGIN == info.Request.EvCode)
-        //{
-        //    message = Encoding.Default.GetString((byte[])info.Request.Data);
-
-        //    string playerName = GetStringDataFromMessage("PlayerName");
-        //    string playerPassword = GetStringDataFromMessage("Password");
-
-        //    string sql = "INSERT INTO viking (name, password, date_created) VALUES ('" + playerName + "', '" + playerPassword + "', now())";
-        //    MySqlCommand cmd = new MySqlCommand(sql, conn);
-        //    cmd.ExecuteNonQuery();
-        //}
     }
 }
+
+//// to insert into database
+//if (1 == info.Request.EvCode)
+//{
+//    string playerName = Encoding.Default.GetString((byte[])info.Request.Data);
+//    string sql = "INSERT INTO user (name, date_created) VALUES ('" + playerName + "', now())";
+//    MySqlCommand cmd = new MySqlCommand(sql, conn);
+//    cmd.ExecuteNonQuery();
+
+//    ++CallsCount;
+//    int cnt = CallsCount;
+//    string ReturnMessage = info.Nickname + " clicked the button. Now the count is " + cnt.ToString();
+
+//    // returns the message to the client
+//    PluginHost.BroadcastEvent(target: ReciverGroup.All,
+//                              senderActor: 0,
+//                              targetGroup: 0,
+//                              data: new Dictionary<byte, object>() { { 245, ReturnMessage } },
+//                              evCode: info.Request.EvCode, 
+//                              cacheOp: 0);
+//}
+//// testing with viking client
+//else if ((byte)EvCode.LOGIN == info.Request.EvCode)
+//{
+//    message = Encoding.Default.GetString((byte[])info.Request.Data);
+
+//    string playerName = GetStringDataFromMessage("PlayerName");
+//    string playerPassword = GetStringDataFromMessage("Password");
+
+//    string sql = "INSERT INTO viking (name, password, date_created) VALUES ('" + playerName + "', '" + playerPassword + "', now())";
+//    MySqlCommand cmd = new MySqlCommand(sql, conn);
+//    cmd.ExecuteNonQuery();
+//}
+
+//string GetStringDataFromMessage(string returnData)
+//{
+//    string temp = returnData + "=";
+//    int pFrom = message.IndexOf(temp) + temp.Length;
+//    int pTo = message.LastIndexOf(",");
+
+//    // there's no comma at the end
+//    if (pTo - pFrom < 0)
+//    {
+//        pFrom = message.LastIndexOf(temp) + temp.Length;
+//        return message.Substring(pFrom);
+//    }
+
+//    return message.Substring(pFrom, pTo - pFrom);
+//}

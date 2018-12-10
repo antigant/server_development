@@ -8,16 +8,17 @@ public class MainMenuVik : MonoBehaviour
     {
         //PhotonNetwork.logLevel = NetworkLogLevel.Full;
 
-        //Connect to the main photon server. This is the only IP and port we ever need to set(!)
-        if (!PhotonNetwork.connected)
-            PhotonNetwork.ConnectUsingSettings("v1.0"); // version of the game/demo. used to separate older clients from newer ones (e.g. if incompatible)
+        ////Connect to the main photon server. This is the only IP and port we ever need to set(!)
+        //if (!PhotonNetwork.connected)
+        //{
+        //    PhotonNetwork.ConnectUsingSettings("v1.0"); // version of the game/demo. used to separate older clients from newer ones (e.g. if incompatible)
+        //}
 
-        //Load name from PlayerPrefs
-        PhotonNetwork.playerName = PlayerPrefs.GetString("playerName", "Guest" + Random.Range(1, 9999));
+        ////Load name from PlayerPrefs
+        //PhotonNetwork.playerName = PlayerPrefs.GetString("playerName", "Guest" + Random.Range(1, 9999));
 
         //Set camera clipping for nicer "main menu" background
         Camera.main.farClipPlane = Camera.main.nearClipPlane + 0.1f;
-
     }
 
     private string roomName = "myRoom";
@@ -35,38 +36,35 @@ public class MainMenuVik : MonoBehaviour
 
         if (PhotonNetwork.room != null)
             return; //Only when we're not in a Room
+        //GUILayout.BeginArea(new Rect((Screen.width - 400) / 2, (Screen.height - 300) / 2, 400, 300));
 
+        //GUILayout.Label("Main Menu");
 
-        GUILayout.BeginArea(new Rect((Screen.width - 400) / 2, (Screen.height - 300) / 2, 400, 300));
+        ////Player name
+        //GUILayout.BeginHorizontal();
+        //GUILayout.Label("Player name:", GUILayout.Width(150));
+        //PhotonNetwork.playerName = GUILayout.TextField(PhotonNetwork.playerName);
+        //if (GUI.changed)//Save name
+        //    PlayerPrefs.SetString("playerName", PhotonNetwork.playerName);
+        //GUILayout.EndHorizontal();
 
-        GUILayout.Label("Main Menu");
+        //// Password
+        //GUILayout.BeginHorizontal();
+        //GUILayout.Label("Password:", GUILayout.Width(150));
 
-        //Player name
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Player name:", GUILayout.Width(150));
-        PhotonNetwork.playerName = GUILayout.TextField(PhotonNetwork.playerName);
-        if (GUI.changed)//Save name
-            PlayerPrefs.SetString("playerName", PhotonNetwork.playerName);
-        GUILayout.EndHorizontal();
+        //if (playerPassword == null)
+        //{
+        //    playerPassword = GUILayout.TextField("password");
+        //    playerPassword = "";
+        //}
+        //else
+        //    playerPassword = GUILayout.PasswordField(playerPassword, '*', 15);
 
-        // Password
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Password:", GUILayout.Width(150));
+        //if (GUI.changed)//Save password
+        //    PlayerPrefs.SetString("playerPassword", playerPassword);
+        //GUILayout.EndHorizontal();
 
-        if (playerPassword == null)
-        {
-            playerPassword = GUILayout.TextField("password");
-            playerPassword = "";
-        }
-        else
-            playerPassword = GUILayout.PasswordField(playerPassword, '*', 15);
-
-        if (GUI.changed)//Save password
-            PlayerPrefs.SetString("playerPassword", playerPassword);
-        GUILayout.EndHorizontal();
-
-        GUILayout.Space(15);
-
+        //GUILayout.Space(15);
 
         //Join room by title
         GUILayout.BeginHorizontal();

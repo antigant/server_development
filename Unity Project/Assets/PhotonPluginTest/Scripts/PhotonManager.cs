@@ -24,7 +24,6 @@ public class PhotonManager : Photon.PunBehaviour
 
         //PUN의 맵 로딩 자동 동기화를 사용할 수 있고, 맵 로딩 초기화 시 발생할 수 있는 네트워크 문제를 피할 수 있습니다.
         PhotonNetwork.automaticallySyncScene = true;
-        CustomPlugin.RegisterCustomType.RegisterClient();
     }
 
     void Start()

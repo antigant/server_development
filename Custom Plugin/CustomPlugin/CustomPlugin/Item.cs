@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using ExitGames.Client.Photon;
+using System.IO;
+//using ExitGames.Client.Photon;
 
 namespace CustomPlugin
 {
@@ -8,69 +9,95 @@ namespace CustomPlugin
     {
         public static readonly byte[] memItemInfo = new byte[General.INTEGER_INT * 2];
 
-        // fields that will be serialized
-        [SerializeField] protected int itemID; // id of the item the player have in the db (this id will be used to search for the item  with the stats and all
-        [SerializeField] protected int itemNameID; // id of the item name
+        public int ItemID { get; private set; }
+        public string Name { get; private set; }
 
         // game object of the item (looks etc), can attach relevant scripts to it too
         public GameObject Obj { get; set; }
-        public string Name { get; set; }
 
-        public int ItemID { get { return itemID; } }
-        public int ItemNameID { get { return itemNameID; } }
-
-        public Item(int id, int nameID)
+        public Item(int id, string name)
         {
-            itemID = id;
-            itemNameID = nameID;
+            ItemID = id;
+            Name = name;
         }
 
-        public static void RegisterServer()
+        public static byte[] Serialize(object o)
         {
-            Protocol.TryRegisterType(typeof(Item), (byte)'A', SerializeItem, DeserializeItem);
-        }
+            Item item = (Item)o;
+            if (item == null) return null;
 
-        public static void RegisterClient()
-        {
-            PhotonPeer.RegisterType(typeof(Item), (byte)'A', SerializeItem, DeserializeItem);
-        }
-
-        public static short SerializeItem(StreamBuffer outStream, object customObject)
-        {
-            Item item = (Item)customObject;
-
-            lock(memItemInfo)
+            using (var ms = new MemoryStream())
             {
-                int index = 0; // byte stream starting index
-                byte[] bytes = memItemInfo;
+                using (var bw = new BinaryWriter(ms))
+                {
+                    bw.Write(item.ItemID);
+                    bw.Write(item.Name);
 
-                // Serialize each value in item class
-                Protocol.Serialize(item.ItemID, bytes, ref index);
-                Protocol.Serialize(item.ItemNameID, bytes, ref index);
-
-                outStream.Write(bytes, 0, memItemInfo.Length);
+                    return ms.ToArray();
+                }
             }
-
-            return (short)memItemInfo.Length;
         }
 
-        public static object DeserializeItem(StreamBuffer inStream, short length)
+        public static object Deserialize(byte[] b)
         {
-            // Temp holders for each member in Item
-            int itemID = 0;
-            int itemNameID = 0;
-
-            lock(memItemInfo)
+            int id = 0; string name = "";
+            using (var ms = new MemoryStream(b))
             {
-                int index = 0; // byte stream strating index
-
-                // Deserialize each value in the same order when serializing
-                Protocol.Deserialize(out itemID, memItemInfo, ref index);
-                Protocol.Deserialize(out itemNameID, memItemInfo, ref index);
+                using (var br = new BinaryReader(ms))
+                {
+                    id = br.ReadInt32();
+                    name = br.ReadString();
+                }
             }
-
-            // Return new instance of Item with the relevant data
-            return new Item(itemID, itemNameID);
+            return new Item(id, name);
         }
+
+        //public static void RegisterServer()
+        //{
+        //    Protocol.TryRegisterType(typeof(Item), (byte)'A', SerializeItem, DeserializeItem);
+        //}
+
+        //public static void RegisterClient()
+        //{
+        //    PhotonPeer.RegisterType(typeof(Item), (byte)'A', SerializeItem, DeserializeItem);
+        //}
+
+        //public static short Serialize(StreamBuffer outStream, object customObject)
+        //{
+        //    Item item = (Item)customObject;
+
+        //    lock(memItemInfo)
+        //    {
+        //        int index = 0; // byte stream starting index
+        //        byte[] bytes = memItemInfo;
+
+        //        // Serialize each value in item class
+        //        Protocol.Serialize(item.ItemID, bytes, ref index);
+        //        Protocol.Serialize(item.ItemNameID, bytes, ref index);
+
+        //        outStream.Write(bytes, 0, memItemInfo.Length);
+        //    }
+
+        //    return (short)memItemInfo.Length;
+        //}
+
+        //public static object Deserialize(StreamBuffer inStream, short length)
+        //{
+        //    // Temp holders for each member in Item
+        //    int itemID = 0;
+        //    int itemNameID = 0;
+
+        //    lock(memItemInfo)
+        //    {
+        //        int index = 0; // byte stream strating index
+
+        //        // Deserialize each value in the same order when serializing
+        //        Protocol.Deserialize(out itemID, memItemInfo, ref index);
+        //        Protocol.Deserialize(out itemNameID, memItemInfo, ref index);
+        //    }
+
+        //    // Return new instance of Item with the relevant data
+        //    return new Item(itemID, itemNameID);
+        //}
     }
 }
