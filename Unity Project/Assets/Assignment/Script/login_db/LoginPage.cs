@@ -6,7 +6,6 @@ public class LoginPage : Photon.PunBehaviour
     string username;
     string password;
     // display the message from server
-    string displayMessage;
 
     GUIStyle textStyle;
 
@@ -62,7 +61,7 @@ public class LoginPage : Photon.PunBehaviour
 
         GUILayout.Space(15);
         textStyle.normal.textColor = Color.red;
-        GUILayout.Label(displayMessage, textStyle);
+        GUILayout.Label(General.Message, textStyle);
 
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Login"))
@@ -82,7 +81,7 @@ public class LoginPage : Photon.PunBehaviour
     void Login()
     {
         byte evCode = (byte)EvCode.LOGIN;
-        string[] content = { username, password };
+        string[] content = { username.ToLower(), password };
         bool reliable = true;
         PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
         //Debug.Log("username: " + username);
@@ -92,11 +91,13 @@ public class LoginPage : Photon.PunBehaviour
     // Use this to receive message from server
     void LoginReceive(byte eventCode, object content, int senderID)
     {
+        if (eventCode != (byte)EvCode.LOGIN)
+            return;
+
         string message = "";
-        if ((eventCode == (byte)EvCode.LOGIN) && (senderID <= 0))
-            message = (string)content;
+        message = (string)content;
         // Successful
-        if(message[0] == 'S')
+        if (message[0] == 'S')
         {
             // set up relevant data for the player
             int accountID = System.Convert.ToInt32(General.GetStringDataFromMessage(message, "AccountID"));
@@ -112,7 +113,7 @@ public class LoginPage : Photon.PunBehaviour
         else if(message[0] == 'U')
         {
             // inform the player that the username/password is incorrect
-            displayMessage = General.GetStringDataFromMessage(message, "Message");
+            General.Message = General.GetStringDataFromMessage(message, "Message");
         }
     }
 

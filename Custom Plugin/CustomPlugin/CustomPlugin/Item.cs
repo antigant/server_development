@@ -7,7 +7,7 @@ namespace CustomPlugin
     [System.Serializable]
     public class Item
     {
-        public static readonly byte[] memItemInfo = new byte[General.INTEGER_INT * 2];
+        //public static readonly byte[] memItemInfo = new byte[General.INTEGER_INT * 2];
 
         public int ItemID { get; private set; }
         public string Name { get; private set; }

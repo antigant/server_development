@@ -122,14 +122,14 @@ namespace TestPlugin
             else
             {
                 // get player name
-                sql = "SELECT player_name FROM player WHERE account_id = '" + accountID + "'";
+                sql = "SELECT * FROM player WHERE account_id = '" + accountID + "'";
                 cmd.CommandText = sql;
                 rdr = cmd.ExecuteReader();
                 string playerName = "";
                 while (rdr.Read())
                     playerName = rdr.GetString(1);
 
-                returnMessage = "Successful, AccountID=" + accountID + "PlayerName=" + playerName;
+                returnMessage = "Successful, AccountID=" + accountID + ", PlayerName=" + playerName;
             }
 
             // returns the message to the client
@@ -145,7 +145,62 @@ namespace TestPlugin
         {
             string[] message = (string[])info.Request.Data;
 
+            string recvUsername = message[0];
+            string recvPassword = message[1];
+            string recvPlayerName = message[2];
 
+            // Check if username is in database
+            string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
+            MySqlCommand cmd = new MySqlCommand(sql, conn);
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            string returnMessage = "";
+
+            if (rdr.HasRows)
+                returnMessage = "Unsuccessful, Message=Username exists already";
+            rdr.Close();
+
+            sql = "SELECT * FROM player WHERE player_name = '" + recvPlayerName + "'";
+            cmd.CommandText = sql;
+            rdr = cmd.ExecuteReader();
+            if (rdr.HasRows)
+                returnMessage = "Unsuccessful, Message=Character Name exist already";
+            rdr.Close();
+
+            // There's no error, thus registration is successful!
+            if (returnMessage == "")
+            {
+                // insert into database
+                sql = "INSERT INTO account (username, password, date_created) VALUES ('" + recvUsername + "', '" + recvPassword + "', now())";
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
+
+                // get account_id from account
+                sql = "SELECT * FROM account WHERE username ='" + recvUsername + "'";
+                cmd.CommandText = sql;
+                rdr = cmd.ExecuteReader();
+                int accountID = 0;
+                while (rdr.Read())
+                    accountID = rdr.GetInt32(0);
+                rdr.Close();
+
+                float val = 0.0f;
+
+                // insert into player table
+                sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '" + recvPlayerName + "', '" + val + "', '" + val + "', '" + val + "')";
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
+
+                returnMessage = "Successful, Message=Registration Complete";
+            }
+
+            // returns the message to the client
+            PluginHost.BroadcastEvent(target: (byte)info.ActorNr,
+                                  senderActor: 0,
+                                  targetGroup: 0,
+                                  data: new Dictionary<byte, object>() { { 245, returnMessage } },
+                                  evCode: info.Request.EvCode,
+                                  cacheOp: 0);
         }
 
         // ----- Open connection to 

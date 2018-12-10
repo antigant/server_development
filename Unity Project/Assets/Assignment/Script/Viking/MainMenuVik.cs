@@ -8,14 +8,14 @@ public class MainMenuVik : MonoBehaviour
     {
         //PhotonNetwork.logLevel = NetworkLogLevel.Full;
 
-        ////Connect to the main photon server. This is the only IP and port we ever need to set(!)
-        //if (!PhotonNetwork.connected)
-        //{
-        //    PhotonNetwork.ConnectUsingSettings("v1.0"); // version of the game/demo. used to separate older clients from newer ones (e.g. if incompatible)
-        //}
+        //Connect to the main photon server. This is the only IP and port we ever need to set(!)
+        if (!PhotonNetwork.connected)
+        {
+            PhotonNetwork.ConnectUsingSettings("v1.0"); // version of the game/demo. used to separate older clients from newer ones (e.g. if incompatible)
+        }
 
-        ////Load name from PlayerPrefs
-        //PhotonNetwork.playerName = PlayerPrefs.GetString("playerName", "Guest" + Random.Range(1, 9999));
+        //Load name from PlayerPrefs
+        PhotonNetwork.playerName = PlayerPrefs.GetString("playerName", "Guest" + Random.Range(1, 9999));
 
         //Set camera clipping for nicer "main menu" background
         Camera.main.farClipPlane = Camera.main.nearClipPlane + 0.1f;
@@ -36,9 +36,17 @@ public class MainMenuVik : MonoBehaviour
 
         if (PhotonNetwork.room != null)
             return; //Only when we're not in a Room
-        //GUILayout.BeginArea(new Rect((Screen.width - 400) / 2, (Screen.height - 300) / 2, 400, 300));
 
-        //GUILayout.Label("Main Menu");
+        if (GUILayout.Button("Logout"))
+        {
+            //PhotonNetwork.LeaveRoom();
+            // save player and pet position
+
+        }
+
+        GUILayout.BeginArea(new Rect((Screen.width - 400) / 2, (Screen.height - 300) / 2, 400, 300));
+
+        GUILayout.Label("Main Menu");
 
         ////Player name
         //GUILayout.BeginHorizontal();

@@ -1,14 +1,19 @@
 ﻿using UnityEngine;
+using CustomPlugin;
 
 public class RegistrationPage : Photon.PunBehaviour
 {
-    string username;
-    string password;
-    string confirmPassword;
+    string username = "";
+    string password = "";
+    string confirmPassword = "";
+    string playerName = "";
     // display the message from server
     string displayMessage;
 
     GUIStyle textStyle;
+
+    bool registerComplete = false;
+    float dt = 0.0f;
 
     void Awake()
     {
@@ -17,15 +22,26 @@ public class RegistrationPage : Photon.PunBehaviour
 
         PhotonNetwork.OnEventCall += RegistrationReceive;
         textStyle = new GUIStyle();
-        textStyle.normal.textColor = Color.black;
+    }
+
+    void Update()
+    {
+        if (!registerComplete)
+            return;
+
+        dt += Time.deltaTime;
+        if (dt < 2.0f)
+            return;
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Login");
     }
 
     void OnGUI()
     {
-
         GUILayout.BeginArea(new Rect((Screen.width - 400) * 0.5f, (Screen.height - 300) * 0.5f, 275, 300));
 
-        GUILayout.Label("Login Page", textStyle);
+        textStyle.normal.textColor = Color.black;
+        GUILayout.Label("Registration Page", textStyle);
 
         GUILayout.BeginHorizontal();
         GUILayout.Label("Username:", GUILayout.Width(90));
@@ -44,7 +60,7 @@ public class RegistrationPage : Photon.PunBehaviour
             password = GUILayout.PasswordField(password, '*', 15);
         GUILayout.EndHorizontal();
 
-        // Password
+        // Confirm password
         GUILayout.BeginHorizontal();
         GUILayout.Label("Confirm password:", GUILayout.Width(90));
         if (confirmPassword == null)
@@ -56,9 +72,15 @@ public class RegistrationPage : Photon.PunBehaviour
             confirmPassword = GUILayout.PasswordField(confirmPassword, '*', 15);
         GUILayout.EndHorizontal();
 
-        GUILayout.Space(20);
-        GUILayout.Label("Player Info", textStyle);
+        // Player info
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Character Name:", GUILayout.Width(90));
+        playerName = GUILayout.TextField(playerName);
+        GUILayout.EndHorizontal();
 
+        GUILayout.Space(15);
+        textStyle.normal.textColor = Color.red;
+        GUILayout.Label(displayMessage, textStyle);
 
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("Register"))
@@ -74,15 +96,42 @@ public class RegistrationPage : Photon.PunBehaviour
     void Registration()
     {
         byte evCode = (byte)EvCode.REGISTRATION;
-        string[] content = { username, password };
+        string[] content = { username.ToLower(), password, playerName };
         bool reliable = true;
-        PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+
+        bool ready = false;
+
+        if (username != "" && password != "" && playerName != "")
+        {
+            if (password == confirmPassword)
+                ready = true;
+            else
+                displayMessage = "Password does not match";
+        }
+        else
+            displayMessage = "Please fill in every field";
+
+        // send over to the server plugin to register if password matches and every textfield is filled
+        if (ready)
+        {
+            PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+            //Debug.Log("username: " + username);
+            //Debug.Log("password: " + password);
+            //Debug.Log("confirmPassword: " + confirmPassword);
+            //Debug.Log("playerName: " + playerName);
+        }
     }
 
     void RegistrationReceive(byte eventCode, object content, int senderID)
     {
+        if (eventCode != (byte)EvCode.REGISTRATION)
+            return;
+
         string message = "";
-        if ((eventCode == (byte)EvCode.REGISTRATION) && (senderID <= 0))
-            message = (string)content;
+        message = (string)content;
+        if(message[0] == 'S')
+            registerComplete = true;
+
+        displayMessage = General.GetStringDataFromMessage(message, "Message");
     }
 }
