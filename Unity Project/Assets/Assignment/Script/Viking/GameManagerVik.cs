@@ -10,17 +10,17 @@ public class GameManagerVik : Photon.MonoBehaviour {
     void OnJoinedRoom()
     {
         StartGame();
-        DoRaiseEvent();
+        //DoRaiseEvent();
     }
     
-    public void DoRaiseEvent()
-    {
-        byte evCode = 2;
-        string contentMessage = "PlayerName=" + PhotonNetwork.playerName + ", Password=" + PlayerPrefs.GetString("playerPassword");
-        byte[] content = System.Text.Encoding.UTF8.GetBytes(contentMessage);
-        bool reliable = true;
-        PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
-    }
+    //public void DoRaiseEvent()
+    //{
+    //    byte evCode = 2;
+    //    string contentMessage = "PlayerName=" + PhotonNetwork.playerName + ", Password=" + PlayerPrefs.GetString("playerPassword");
+    //    byte[] content = System.Text.Encoding.UTF8.GetBytes(contentMessage);
+    //    bool reliable = true;
+    //    PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+    //}
 
     IEnumerator OnLeftRoom()
     {
@@ -30,8 +30,8 @@ public class GameManagerVik : Photon.MonoBehaviour {
         while(PhotonNetwork.room!=null || PhotonNetwork.connected==false)
             yield return 0;
 
-        Application.LoadLevel(Application.loadedLevel);
-
+        //Application.LoadLevel(Application.loadedLevel);
+        //UnityEngine.SceneManagement.SceneManager.LoadScene("InitServer");
     }
 
     void StartGame()
@@ -56,8 +56,26 @@ public class GameManagerVik : Photon.MonoBehaviour {
 
         if (GUILayout.Button("Leave Room"))
         {
+            // add code to save player and pet's position
+            Logout();
+
+            UnityEngine.SceneManagement.SceneManager.LoadScene("InitServer");
             PhotonNetwork.LeaveRoom();
         }
+    }
+
+    public void Logout()
+    {
+        byte evCode = (byte)EvCode.LOGOUT;
+        // logout to save player and pet position
+        string[] content = { Player.GetInstance().GetAccountID().ToString(), Player.GetInstance().GetPosition().x.ToString(), Player.GetInstance().GetPosition().y.ToString(), Player.GetInstance().GetPosition().z.ToString(), Player.GetInstance().GetPetPosition().x.ToString(), Player.GetInstance().GetPetPosition().y.ToString(), Player.GetInstance().GetPetPosition().z.ToString() };
+        bool reliable = true;
+        PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+    }
+
+    private void OnApplicationQuit()
+    {
+        Logout();
     }
 
     void OnDisconnectedFromPhoton()

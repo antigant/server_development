@@ -65,9 +65,9 @@ namespace TestPlugin
                         Registration(info);
                         break;
                     }
-                case (byte)EvCode.PHOTON_TEST:
+                case (byte)EvCode.LOGOUT:
                     {
-                        Photon_Test(info);
+                        Logout(info);
                         break;
                     }
 
@@ -78,26 +78,26 @@ namespace TestPlugin
             DisconnectFromMySQL();
         }
 
-        void Photon_Test(IRaiseEventCallInfo info)
-        {
-            //int[] test = { 100, 11238 };
-            Item test = new Item(513, "new test item");
+        //void Photon_Test(IRaiseEventCallInfo info)
+        //{
+        //    //int[] test = { 100, 11238 };
+        //    Item[] test = new Item[2]
+        //    {
+        //        new Item(541, "hello"),
+        //        new Item(123, "byee"),
+        //    };
 
-            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } }, 
-                senderActor: 0,
-                evCode:info.Request.EvCode, 
-                data: new Dictionary<byte, object>() { { 245, test }, { 254, 0 } }, 
-                cacheOp: CacheOperations.DoNotCache);
-        }
+        //    PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } }, 
+        //        senderActor: 0,
+        //        evCode:info.Request.EvCode, 
+        //        data: new Dictionary<byte, object>() { { 245, test }, { 254, 0 } }, 
+        //        cacheOp: CacheOperations.DoNotCache);
+        //}
 
         void Login(IRaiseEventCallInfo info)
         {
             // check if both username and password is right
             string[] message = (string[])info.Request.Data;
-
-            // extract the message
-            //string recvUsername = General.GetStringDataFromMessage(message, "Username");
-            //string recvPassword = General.GetStringDataFromMessage(message, "Password");
 
             string recvUsername = message[0];
             string recvPassword = message[1];
@@ -116,20 +116,43 @@ namespace TestPlugin
             }
             rdr.Close();
 
-            string returnMessage = "";
+            // check if the account is currently active
+            bool accActive = false;
+            sql = "SELECT * FROM active_users WHERE account_id ='" + accountID + "'";
+            cmd.CommandText = sql;
+            rdr = cmd.ExecuteReader();
+            if (rdr.HasRows)
+                //accActive = true;
+                accActive = false;
+            rdr.Close();
+
+            string[] returnMessage = new string[6];
             if (username == null || password != recvPassword)
-                returnMessage = "Unsuccessful, Message=Incorrect username/password";
+                returnMessage[0] = "Unsuccessful, Message=Incorrect username/password";
+            else if (accActive)
+                returnMessage[0] = "Unsuccessful, Message=Account is currently active";
             else
             {
                 // get player name
-                sql = "SELECT * FROM player WHERE account_id = '" + accountID + "'";
+                sql = "SELECT * FROM player WHERE account_id ='" + accountID + "'";
                 cmd.CommandText = sql;
                 rdr = cmd.ExecuteReader();
-                string playerName = "";
-                while (rdr.Read())
-                    playerName = rdr.GetString(1);
+                returnMessage[0] = "Successful";
+                returnMessage[1] = accountID.ToString();
 
-                returnMessage = "Successful, AccountID=" + accountID + ", PlayerName=" + playerName;
+                while (rdr.Read())
+                {
+                    returnMessage[2] = rdr.GetString(1);
+                    returnMessage[3] = rdr.GetFloat(2).ToString();
+                    returnMessage[4] = rdr.GetFloat(3).ToString();
+                    returnMessage[5] = rdr.GetFloat(4).ToString();
+                }
+                rdr.Close();
+
+                // insert account_id into active table list (to state that account has someone playing)
+                //sql = "INSERT INTO active_users (account_id) VALUES ('" + accountID + "')";
+                //cmd.CommandText = sql;
+                //cmd.ExecuteNonQuery();
             }
 
             // returns the message to the client
@@ -150,7 +173,7 @@ namespace TestPlugin
             string recvPlayerName = message[2];
 
             // Check if username is in database
-            string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
+            string sql = "SELECT * FROM account WHERE username ='" + recvUsername + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -160,7 +183,7 @@ namespace TestPlugin
                 returnMessage = "Unsuccessful, Message=Username exists already";
             rdr.Close();
 
-            sql = "SELECT * FROM player WHERE player_name = '" + recvPlayerName + "'";
+            sql = "SELECT * FROM player WHERE player_name ='" + recvPlayerName + "'";
             cmd.CommandText = sql;
             rdr = cmd.ExecuteReader();
             if (rdr.HasRows)
@@ -201,6 +224,26 @@ namespace TestPlugin
                                   data: new Dictionary<byte, object>() { { 245, returnMessage } },
                                   evCode: info.Request.EvCode,
                                   cacheOp: 0);
+        }
+
+        void Logout(IRaiseEventCallInfo info)
+        {
+            string[] message = (string[])info.Request.Data;
+
+            //string accountID = message[0];
+            //float pos_x = Convert.ToSingle(message[1]);
+            //float pos_y = Convert.ToSingle(message[2]);
+            //float pos_z= Convert.ToSingle(message[3]);
+            //float petPos_x = Convert.ToSingle(message[4]);
+            //float petPos_y = Convert.ToSingle(message[5]);
+            //float petPos_z = Convert.ToSingle(message[6]);
+
+            //// delete user from active list
+            //string sql = "DELETE FROM active_users WHERE account_id='" + message[0] + "'";
+            string sql = "UPDATE player SET pos_x='" + message[1] + "', pos_y='" + message[2] + "', pos_z='" + message[3] + "' WHERE account_id ='" + message[0] + "'";
+            MySqlCommand cmd = new MySqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+
         }
 
         // ----- Open connection to 

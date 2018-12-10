@@ -36,6 +36,7 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
         controllerScript.SetIsRemotePlayer(!photonView.isMine);
 
         gameObject.name = gameObject.name + photonView.viewID;
+        gameObject.transform.position = Player.GetInstance().GetPosition();
     }
 
     void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -78,6 +79,7 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, correctPlayerPos, Time.deltaTime * 5);
             transform.rotation = Quaternion.Lerp(transform.rotation, correctPlayerRot, Time.deltaTime * 5);
         }
+        Player.GetInstance().SetPosition(gameObject.transform.position);
     }
 
     void OnPhotonInstantiate(PhotonMessageInfo info)
