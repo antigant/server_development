@@ -7,7 +7,7 @@ public class ThirdPersonControllerNET : MonoBehaviour
 {
 	public Rigidbody target;
 		// The object we're steering
-	public float speed = 1.0f, walkSpeedDownscale = 2.0f, turnSpeed = 2.0f, mouseTurnSpeed = 0.3f, jumpSpeed = 1.0f;
+	public float speed = 2.5f, walkSpeedDownscale = 2.0f, turnSpeed = 2.0f, mouseTurnSpeed = 0.3f, jumpSpeed = 1.0f;
 		// Tweak to ajust character responsiveness
 	public LayerMask groundLayers = -1;
 		// Which layers should be walkable?

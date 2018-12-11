@@ -125,8 +125,11 @@ namespace TestPlugin
                 accActive = true;
             rdr.Close();
 
-            string[] returnMessage = new string[6]
+            string[] returnMessage = new string[9]
             {
+                "NULL",
+                "NULL",
+                "NULL",
                 "NULL",
                 "NULL",
                 "NULL",
@@ -140,7 +143,7 @@ namespace TestPlugin
                 returnMessage[0] = "Unsuccessful, Message=Account is currently active";
             else
             {
-                // get player name
+                // get player name & position
                 sql = "SELECT * FROM player WHERE account_id ='" + accountID + "'";
                 cmd.CommandText = sql;
                 rdr = cmd.ExecuteReader();
@@ -153,6 +156,18 @@ namespace TestPlugin
                     returnMessage[3] = rdr.GetFloat(2).ToString();
                     returnMessage[4] = rdr.GetFloat(3).ToString();
                     returnMessage[5] = rdr.GetFloat(4).ToString();
+                }
+                rdr.Close();
+
+                // get pet's position
+                sql = "SELECT * FROM pet WHERE account_id ='" + accountID + "'";
+                cmd.CommandText = sql;
+                rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                { 
+                    returnMessage[6] = rdr.GetFloat(1).ToString();
+                    returnMessage[7] = rdr.GetFloat(2).ToString();
+                    returnMessage[8] = rdr.GetFloat(3).ToString();
                 }
                 rdr.Close();
 
@@ -212,10 +227,13 @@ namespace TestPlugin
                     accountID = rdr.GetInt32(0);
                 rdr.Close();
 
-                float val = 0.0f;
-
                 // insert into player table
-                sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '" + recvPlayerName + "', '" + val + "', '" + val + "', '" + val + "')";
+                sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '" + recvPlayerName + "', '51.09559', '3.4', '44.22058')";
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
+
+                // insert into pet table
+                sql = "INSERT INTO pet (account_id, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '51.0956', '2.3454', '43.52058')";
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
 
@@ -238,6 +256,10 @@ namespace TestPlugin
             //string sql = "DELETE FROM active_users WHERE account_id='" + message[0] + "'";
             string sql = "UPDATE player SET pos_x='" + message[1] + "', pos_y='" + message[2] + "', pos_z='" + message[3] + "' WHERE account_id ='" + message[0] + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
+            cmd.ExecuteNonQuery();
+
+            sql = "UPDATE pet SET pos_x='" + message[4] + "', pos_y='" + message[5] + "', pos_z='" + message[6] + "' WHERE account_id ='" + message[0] + "'";
+            cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
             sql = "DELETE FROM active_users WHERE account_id = '" + message[0] + "'";

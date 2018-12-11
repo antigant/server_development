@@ -106,11 +106,20 @@ public class LoginPage : Photon.PunBehaviour
             string playerName = message[2];
             // Init the player
             Player.GetInstance(accountID, playerName);
+
+            // player position
             float pos_x = System.Convert.ToSingle(message[3]);
             float pos_y = System.Convert.ToSingle(message[4]);
             float pos_z = System.Convert.ToSingle(message[5]);
             Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
             Player.GetInstance().SetPosition(pos);
+
+            // pet position
+            pos_x = System.Convert.ToSingle(message[6]);
+            pos_y = System.Convert.ToSingle(message[7]);
+            pos_z = System.Convert.ToSingle(message[8]);
+            pos = new Vector3(pos_x, pos_y, pos_z);
+            Player.GetInstance().SetPetPosition(pos);
 
             // go over to viking scene
             UnityEngine.SceneManagement.SceneManager.LoadScene("VikingScene");
