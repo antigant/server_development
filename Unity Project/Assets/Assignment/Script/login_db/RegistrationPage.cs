@@ -43,7 +43,7 @@ public class RegistrationPage : Photon.PunBehaviour
             LoginPage();
         }
 
-        GUILayout.BeginArea(new Rect((Screen.width - 400) * 0.5f, (Screen.height - 300) * 0.5f, 275, 300));
+        GUILayout.BeginArea(new Rect((Screen.width - 400) * 0.5f, (Screen.height - 300) * 0.5f, 300, 300));
 
         textStyle.normal.textColor = Color.black;
         GUILayout.Label("Registration Page", textStyle);
@@ -109,7 +109,18 @@ public class RegistrationPage : Photon.PunBehaviour
         if (username != "" && password != "" && playerName != "")
         {
             if (password == confirmPassword)
-                ready = true;
+            {
+                int maxChar = 15;
+                if (playerName.Length <= maxChar)
+                {
+                    if(username.Length <= maxChar)
+                        ready = true;
+                    else
+                        displayMessage = "Username has to be less than " + maxChar + " characters";
+                }
+                else
+                    displayMessage = "Character name has to be less than " + maxChar + " characters";
+            }
             else
                 displayMessage = "Password does not match";
         }

@@ -105,7 +105,7 @@ public class LoginPage : Photon.PunBehaviour
             int accountID = System.Convert.ToInt32(message[1]);
             string playerName = message[2];
             // Init the player
-            Player.GetInstance(accountID, playerName);
+            Player.GetInstance(accountID, playerName, true);
 
             // player position
             float pos_x = System.Convert.ToSingle(message[3]);
