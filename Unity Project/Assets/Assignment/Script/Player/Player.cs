@@ -40,9 +40,9 @@ public class Player
     }
 
     // use this to init the player
-    public static Player GetInstance(int id, string name)
+    public static Player GetInstance(int id, string name, bool force = false)
     {
-        if (instance != null)
+        if (instance != null && !force)
             return instance;
         return instance = new Player(id, name);
     }
