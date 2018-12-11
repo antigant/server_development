@@ -3,8 +3,8 @@ using CustomPlugin;
 
 public class LoginPage : Photon.PunBehaviour
 {
-    string username;
-    string password;
+    string username = "";
+    string password = "";
     // display the message from server
 
     GUIStyle textStyle;
@@ -28,14 +28,16 @@ public class LoginPage : Photon.PunBehaviour
 
     void OnGUI()
     {
+        if (GUILayout.Button("Quit Game"))
+        {
+            QuitGame();
+        }
+
         if (!PhotonNetwork.connected)
         {
             ShowConnectingGUI();
             return;   //Wait for a connection
         }
-
-        //if (PhotonNetwork.room == null)
-        //    return; //Only when we're not in a Room
 
         GUILayout.BeginArea(new Rect((Screen.width - 400) * 0.5f, (Screen.height - 300) * 0.5f, 275, 300));
 
@@ -91,29 +93,35 @@ public class LoginPage : Photon.PunBehaviour
     // Use this to receive message from server
     void LoginReceive(byte eventCode, object content, int senderID)
     {
-        if (eventCode != (byte)EvCode.LOGIN)
+        if (eventCode != (byte)EvCode.LOGIN || senderID > 0)
             return;
 
-        string message = "";
-        message = (string)content;
+        string[] message;
+        message = (string[])content;
         // Successful
-        if (message[0] == 'S')
+        if (message[0][0] == 'S')
         {
             // set up relevant data for the player
-            int accountID = System.Convert.ToInt32(General.GetStringDataFromMessage(message, "AccountID"));
-            string playerName = General.GetStringDataFromMessage(message, "PlayerName");
+            int accountID = System.Convert.ToInt32(message[1]);
+            string playerName = message[2];
             // Init the player
-            Player.GetInstance(accountID).SetPlayerName(playerName);
+            Player.GetInstance(accountID, playerName);
+            float pos_x = System.Convert.ToSingle(message[3]);
+            float pos_y = System.Convert.ToSingle(message[4]);
+            float pos_z = System.Convert.ToSingle(message[5]);
+            Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+            Player.GetInstance().SetPosition(pos);
 
             // go over to viking scene
             UnityEngine.SceneManagement.SceneManager.LoadScene("VikingScene");
+            General.Message = "";
             PhotonNetwork.LeaveRoom();
         }
         // Unsuccesful
-        else if(message[0] == 'U')
+        else if(message[0][0] == 'U')
         {
             // inform the player that the username/password is incorrect
-            General.Message = General.GetStringDataFromMessage(message, "Message");
+            General.Message = General.GetStringDataFromMessage(message[0], "Message");
         }
     }
 
@@ -131,5 +139,10 @@ public class LoginPage : Photon.PunBehaviour
         GUILayout.Label("Hint: This demo uses a settings file and logs the server address to the console.");
 
         GUILayout.EndArea();
+    }
+
+    private void QuitGame()
+    {
+        Application.Quit();
     }
 }

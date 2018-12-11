@@ -40,7 +40,7 @@ public class ChatVik : Photon.MonoBehaviour
         //Chat input
         GUILayout.BeginHorizontal(); 
         GUI.SetNextControlName("ChatField");
-    chatInput = GUILayout.TextField(chatInput, GUILayout.MinWidth(200));
+        chatInput = GUILayout.TextField(chatInput, GUILayout.MinWidth(200));
        
         if (Event.current.type == EventType.KeyDown && Event.current.character == '\n'){
             if (GUI.GetNameOfFocusedControl() == "ChatField")
@@ -80,7 +80,7 @@ public class ChatVik : Photon.MonoBehaviour
     [PunRPC]
     void SendChatMessage(string text, PhotonMessageInfo info)
     {
-        AddMessage("[" + info.sender + "] " + text);
+        AddMessage("[" + Player.GetInstance().GetPlayerName() + "] " + text);
     }
 
     void SendChat(PhotonTargets target)

@@ -1,4 +1,6 @@
-﻿// Singleton class that the entire game can access
+﻿using UnityEngine;
+
+// Singleton class that the entire game can access
 public class Player
 {
     static Player instance = null;
@@ -11,10 +13,14 @@ public class Player
     // curr available slot
     int currItemSlot;
 
+    Vector3 position;
+    Vector3 petPosition;
+
     // Protect another object from being instantiate
-    private Player(int accountID)
+    private Player(int id, string name)
     {
-        this.accountID = accountID;
+        accountID = id;
+        playerName = name;
 
         // can hold x amount of item id in it
         item = new int[10];
@@ -22,6 +28,9 @@ public class Player
         for (int i = 0; i < item.Length; ++i)
             item[i] = -1;
         currItemSlot = 0;
+
+        // Delete this later
+        petPosition = Vector3.zero;
     }
 
     // use this to get the player info
@@ -31,17 +40,22 @@ public class Player
     }
 
     // use this to init the player
-    public static Player GetInstance(int accountID)
+    public static Player GetInstance(int id, string name)
     {
         if (instance != null)
             return instance;
-        return instance = new Player(accountID);
+        return instance = new Player(id, name);
     }
 
     // setter
-    public void SetPlayerName(string playerName)
+    public void SetPosition(Vector3 pos)
     {
-        this.playerName = playerName;
+        position = pos;
+    }
+
+    public void SetPetPosition(Vector3 pos)
+    {
+        petPosition = pos;
     }
 
     // getter
@@ -53,6 +67,16 @@ public class Player
     public int GetAccountID()
     {
         return accountID;
+    }
+
+    public Vector3 GetPosition()
+    {
+        return position;
+    }
+
+    public Vector3 GetPetPosition()
+    {
+        return petPosition;
     }
 
     public void AddItem(int itemID)
