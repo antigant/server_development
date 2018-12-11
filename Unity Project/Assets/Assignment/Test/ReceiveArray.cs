@@ -15,7 +15,7 @@ public class ReceiveArray : Photon.PunBehaviour
         //if (!PhotonNetwork.connected)
         //    PhotonNetwork.ConnectUsingSettings("v1.0");
 
-        PhotonNetwork.OnEventCall += TestReceive;
+        //PhotonNetwork.OnEventCall += TestReceive;
     }
 
     private void Update()
@@ -58,16 +58,16 @@ public class ReceiveArray : Photon.PunBehaviour
     //    Debug.Log("Still works");
     //}
 
-    void TestReceive(byte eventCode, object content, int senderID)
-    {
-        if (eventCode != (byte)EvCode.LOGOUT)
-            return;
+    //void TestReceive(byte eventCode, object content, int senderID)
+    //{
+    //    if (eventCode != (byte)EvCode.LOGOUT)
+    //        return;
 
-        General.Message = (string)content;
+    //    General.Message = (string)content;
 
-        //testArray = (int[])content;
-        //testItem = Item.Deserialize((byte[])content) as Item[];
-    }
+    //    //testArray = (int[])content;
+    //    //testItem = Item.Deserialize((byte[])content) as Item[];
+    //}
 
     void ShowConnectingGUI()
     {
