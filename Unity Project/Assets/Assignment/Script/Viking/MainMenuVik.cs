@@ -28,7 +28,12 @@ public class MainMenuVik : MonoBehaviour
         if (dt < 1.25f)
             return;
 
-        PhotonNetwork.JoinOrCreateRoom("InitServer", new RoomOptions() { MaxPlayers = 10 }, TypedLobby.Default);
+        RoomOptions options = new RoomOptions();
+        options.MaxPlayers = 0;
+        PhotonNetwork.AuthValues = new AuthenticationValues();
+        PhotonNetwork.AuthValues.UserId = Player.GetInstance().GetPlayerName();
+
+        PhotonNetwork.JoinOrCreateRoom("GameRoom", options, TypedLobby.Default);
         gameObject.SetActive(false);
     }
 
@@ -147,7 +152,6 @@ public class MainMenuVik : MonoBehaviour
 
     //    GUILayout.EndArea();
     //}
-
 
     void ShowConnectingGUI()
     {

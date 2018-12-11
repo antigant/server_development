@@ -28,18 +28,15 @@ public class LoginPage : Photon.PunBehaviour
 
     void OnGUI()
     {
+        if (GUILayout.Button("Quit Game"))
+        {
+            QuitGame();
+        }
+
         if (!PhotonNetwork.connected)
         {
             ShowConnectingGUI();
             return;   //Wait for a connection
-        }
-
-        //if (PhotonNetwork.room == null)
-        //    return; //Only when we're not in a Room
-
-        if (GUILayout.Button("Quit Game"))
-        {
-            QuitGame();
         }
 
         GUILayout.BeginArea(new Rect((Screen.width - 400) * 0.5f, (Screen.height - 300) * 0.5f, 275, 300));
@@ -96,7 +93,7 @@ public class LoginPage : Photon.PunBehaviour
     // Use this to receive message from server
     void LoginReceive(byte eventCode, object content, int senderID)
     {
-        if (eventCode != (byte)EvCode.LOGIN)
+        if (eventCode != (byte)EvCode.LOGIN || senderID > 0)
             return;
 
         string[] message;
@@ -117,6 +114,7 @@ public class LoginPage : Photon.PunBehaviour
 
             // go over to viking scene
             UnityEngine.SceneManagement.SceneManager.LoadScene("VikingScene");
+            General.Message = "";
             PhotonNetwork.LeaveRoom();
         }
         // Unsuccesful

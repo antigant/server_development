@@ -12,15 +12,6 @@ public class GameManagerVik : Photon.MonoBehaviour {
         StartGame();
         //DoRaiseEvent();
     }
-    
-    //public void DoRaiseEvent()
-    //{
-    //    byte evCode = 2;
-    //    string contentMessage = "PlayerName=" + PhotonNetwork.playerName + ", Password=" + PlayerPrefs.GetString("playerPassword");
-    //    byte[] content = System.Text.Encoding.UTF8.GetBytes(contentMessage);
-    //    bool reliable = true;
-    //    PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
-    //}
 
     IEnumerator OnLeftRoom()
     {

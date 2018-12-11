@@ -38,6 +38,11 @@ public class RegistrationPage : Photon.PunBehaviour
 
     void OnGUI()
     {
+        if (GUILayout.Button("Back"))
+        {
+            LoginPage();
+        }
+
         GUILayout.BeginArea(new Rect((Screen.width - 400) * 0.5f, (Screen.height - 300) * 0.5f, 275, 300));
 
         textStyle.normal.textColor = Color.black;
@@ -124,7 +129,7 @@ public class RegistrationPage : Photon.PunBehaviour
 
     void RegistrationReceive(byte eventCode, object content, int senderID)
     {
-        if (eventCode != (byte)EvCode.REGISTRATION)
+        if (eventCode != (byte)EvCode.REGISTRATION || senderID > 0)
             return;
 
         string message = "";
@@ -133,5 +138,11 @@ public class RegistrationPage : Photon.PunBehaviour
             registerComplete = true;
 
         displayMessage = General.GetStringDataFromMessage(message, "Message");
+    }
+
+    // goes back to login page
+    void LoginPage()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Login");
     }
 }

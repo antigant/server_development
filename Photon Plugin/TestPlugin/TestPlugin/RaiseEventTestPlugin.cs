@@ -122,11 +122,18 @@ namespace TestPlugin
             cmd.CommandText = sql;
             rdr = cmd.ExecuteReader();
             if (rdr.HasRows)
-                //accActive = true;
-                accActive = false;
+                accActive = true;
             rdr.Close();
 
-            string[] returnMessage = new string[6];
+            string[] returnMessage = new string[6]
+            {
+                "NULL",
+                "NULL",
+                "NULL",
+                "NULL",
+                "NULL",
+                "NULL",
+            };
             if (username == null || password != recvPassword)
                 returnMessage[0] = "Unsuccessful, Message=Incorrect username/password";
             else if (accActive)
@@ -150,18 +157,16 @@ namespace TestPlugin
                 rdr.Close();
 
                 // insert account_id into active table list (to state that account has someone playing)
-                //sql = "INSERT INTO active_users (account_id) VALUES ('" + accountID + "')";
-                //cmd.CommandText = sql;
-                //cmd.ExecuteNonQuery();
+                sql = "INSERT INTO active_users (account_id) VALUES ('" + accountID + "')";
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
             }
 
-            // returns the message to the client
-            PluginHost.BroadcastEvent(target: (byte)info.ActorNr,
-                                  senderActor: 0,
-                                  targetGroup: 0,
-                                  data: new Dictionary<byte, object>() { { 245, returnMessage } },
-                                  evCode: info.Request.EvCode,
-                                  cacheOp: 0);
+            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+                senderActor: 0,
+                evCode: info.Request.EvCode,
+                data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                cacheOp: CacheOperations.DoNotCache);
         }
 
         void Registration(IRaiseEventCallInfo info)
@@ -218,25 +223,16 @@ namespace TestPlugin
             }
 
             // returns the message to the client
-            PluginHost.BroadcastEvent(target: (byte)info.ActorNr,
-                                  senderActor: 0,
-                                  targetGroup: 0,
-                                  data: new Dictionary<byte, object>() { { 245, returnMessage } },
-                                  evCode: info.Request.EvCode,
-                                  cacheOp: 0);
+            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+                senderActor: 0,
+                evCode: info.Request.EvCode,
+                data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                cacheOp: CacheOperations.DoNotCache);
         }
 
         void Logout(IRaiseEventCallInfo info)
         {
             string[] message = (string[])info.Request.Data;
-
-            //string accountID = message[0];
-            //float pos_x = Convert.ToSingle(message[1]);
-            //float pos_y = Convert.ToSingle(message[2]);
-            //float pos_z= Convert.ToSingle(message[3]);
-            //float petPos_x = Convert.ToSingle(message[4]);
-            //float petPos_y = Convert.ToSingle(message[5]);
-            //float petPos_z = Convert.ToSingle(message[6]);
 
             //// delete user from active list
             //string sql = "DELETE FROM active_users WHERE account_id='" + message[0] + "'";
@@ -244,6 +240,9 @@ namespace TestPlugin
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             cmd.ExecuteNonQuery();
 
+            sql = "DELETE FROM active_users WHERE account_id = '" + message[0] + "'";
+            cmd.CommandText = sql;
+            cmd.ExecuteNonQuery();
         }
 
         // ----- Open connection to 
