@@ -4,6 +4,7 @@ using System.Collections;
 public class MainMenuVik : MonoBehaviour
 {
     float dt;
+    public GameObject canvas;
 
     void Awake()
     {
@@ -35,6 +36,7 @@ public class MainMenuVik : MonoBehaviour
 
         PhotonNetwork.JoinOrCreateRoom("GameRoom", options, TypedLobby.Default);
         gameObject.SetActive(false);
+        canvas.SetActive(true);
     }
 
     //private string roomName = "myRoom";

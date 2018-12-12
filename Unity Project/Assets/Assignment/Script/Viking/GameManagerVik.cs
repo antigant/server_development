@@ -38,7 +38,7 @@ public class GameManagerVik : Photon.MonoBehaviour {
         objs[0] = enabledRenderers;
 
         // Spawn our local player
-        PhotonNetwork.Instantiate(this.playerPrefabName, transform.position, Quaternion.identity, 0, objs);
+        PhotonNetwork.Instantiate(playerPrefabName, transform.position, Quaternion.identity, 0, objs);
     }
 
     void OnGUI()

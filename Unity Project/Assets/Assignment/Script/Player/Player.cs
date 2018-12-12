@@ -8,13 +8,19 @@ public class Player
     readonly int accountID;
     // name of the character in the game
     string playerName;
-    // total number of item this can store
+    // store the item_id of the item
     int[] item;
+    // number of item in the arary item (can technically use currItemSlot but I will just create another var for future expansion)
+    int itemCount;
     // curr available slot
     int currItemSlot;
 
+    // last position
     Vector3 position;
     Vector3 petPosition;
+
+    // inventory
+    Inventory inventory;
 
     // Protect another object from being instantiate
     private Player(int id, string name)
@@ -23,7 +29,7 @@ public class Player
         playerName = name;
 
         // can hold x amount of item id in it
-        item = new int[10];
+        item = new int[9];
         // use -1 itemID to identify that the slot is empty
         for (int i = 0; i < item.Length; ++i)
             item[i] = -1;
@@ -58,6 +64,11 @@ public class Player
         petPosition = pos;
     }
 
+    public void SetInventory(Inventory invent)
+    {
+        inventory = invent;
+    }
+
     // getter
     public string GetPlayerName()
     {
@@ -79,10 +90,29 @@ public class Player
         return petPosition;
     }
 
+    public Inventory GetInventroy()
+    {
+        return inventory;
+    }
+
+    // returns the total number of items
+    public int GetItemCount()
+    {
+        return itemCount;
+    }
+
+    public int GetInventorySize()
+    {
+        return item.Length;
+    }
+
     public void AddItem(int itemID)
     {
         item[currItemSlot] = itemID;
         ++currItemSlot;
+        ++itemCount;
+
+        inventory.InventoryLook();
     }
     
     public void RemoveItem(int itemID)
@@ -97,13 +127,21 @@ public class Player
             // found the ID of the item
             item[i] = -1; // "remove" the item
             slotRemoved = i;
+            --currItemSlot;
+            --itemCount;
         }
 
         // using this loop to rearrange the item in the array
-        for(int i = slotRemoved; i < item.Length - 1; ++i)
+        for (int i = slotRemoved; i < item.Length - 1; ++i)
         {
             item[i] = item[++i];
             item[++i] = -1;
         }
+
+        // return if no item is deleted, won't update the inventory
+        if (slotRemoved >= item.Length)
+            return;
+
+        inventory.InventoryLook();
     }
 }

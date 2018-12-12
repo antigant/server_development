@@ -6,7 +6,7 @@
         REGISTRATION,
         LOGOUT,
         RESET_PASSWORD,
-
-        PHOTON_TEST = 100,
+        UPDATE_ITEM,
+        INIT_INVENTORY,
     }
 }

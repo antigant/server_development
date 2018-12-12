@@ -101,8 +101,7 @@ public class LoginPage : Photon.PunBehaviour
         if (eventCode != (byte)EvCode.LOGIN || senderID > 0)
             return;
 
-        string[] message;
-        message = (string[])content;
+        string[] message = (string[])content;
         // Successful
         if (message[0][0] == 'S')
         {
