@@ -76,6 +76,13 @@ public class LoginPage : Photon.PunBehaviour
         }
         GUILayout.EndHorizontal();
 
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Reset Password"))
+        {
+            ResetPassword();
+        }
+        GUILayout.EndHorizontal();
+
         GUILayout.EndArea();
     }
 
@@ -86,8 +93,6 @@ public class LoginPage : Photon.PunBehaviour
         string[] content = { username.ToLower(), password };
         bool reliable = true;
         PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
-        //Debug.Log("username: " + username);
-        //Debug.Log("password: " + password);
     }
 
     // Use this to receive message from server
@@ -137,7 +142,14 @@ public class LoginPage : Photon.PunBehaviour
     // brings the player to the registration screen
     void Registration()
     {
+        General.Message = "";
         UnityEngine.SceneManagement.SceneManager.LoadScene("Registration");
+    }
+
+    void ResetPassword()
+    {
+        General.Message = "";
+        UnityEngine.SceneManagement.SceneManager.LoadScene("ResetPassword");
     }
 
     void ShowConnectingGUI()
