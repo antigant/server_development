@@ -3,7 +3,7 @@
 // Singleton class that the entire game can access
 public class Player
 {
-    static Player instance = null;
+    static Player instance;
 
     readonly int accountID;
     // name of the character in the game
@@ -25,18 +25,9 @@ public class Player
     // Protect another object from being instantiate
     private Player(int id, string name)
     {
+        ResetPlayer();
         accountID = id;
         playerName = name;
-
-        // can hold x amount of item id in it
-        item = new int[9];
-        // use -1 itemID to identify that the slot is empty
-        for (int i = 0; i < item.Length; ++i)
-            item[i] = -1;
-        currItemSlot = 0;
-
-        // Delete this later
-        petPosition = Vector3.zero;
     }
 
     // use this to get the player info
@@ -53,6 +44,21 @@ public class Player
         return instance = new Player(id, name);
     }
 
+    public void ResetPlayer()
+    {
+        instance = null;
+        playerName = "";
+        item = null;
+        inventory = null;
+
+        currItemSlot = 0;
+        itemCount = 0;
+
+        // Delete this later
+        position = Vector3.zero;
+        petPosition = Vector3.zero;
+    }
+
     // setter
     public void SetPosition(Vector3 pos)
     {
@@ -67,6 +73,19 @@ public class Player
     public void SetInventory(Inventory invent)
     {
         inventory = invent;
+    }
+
+    public void SetItems(int[] itemIDs)
+    {
+        item = itemIDs;
+        // init itemCount to be the correct value
+        for (int i = 0; i < item.Length; ++i)
+        {
+            if (item[i] == -1)
+                break;
+            ++itemCount;
+        }
+        inventory.InventoryLook();
     }
 
     // getter
@@ -108,6 +127,9 @@ public class Player
 
     public void AddItem(int itemID)
     {
+        // do not add if item is more than the what it can hold LOL stupid mistake
+        if (itemCount > item.Length)
+            return;
         item[currItemSlot] = itemID;
         ++currItemSlot;
         ++itemCount;

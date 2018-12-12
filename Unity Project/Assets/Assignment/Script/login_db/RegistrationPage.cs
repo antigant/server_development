@@ -11,7 +11,7 @@ public class RegistrationPage : Photon.PunBehaviour
 
     GUIStyle textStyle;
 
-    bool registerComplete = false;
+    static bool registerComplete;
     float dt = 0.0f;
 
     void Awake()
@@ -19,8 +19,8 @@ public class RegistrationPage : Photon.PunBehaviour
         //Set camera clipping for nicer "main menu" background
         Camera.main.farClipPlane = Camera.main.nearClipPlane + 0.1f;
 
-        PhotonNetwork.OnEventCall += RegistrationReceive;
         textStyle = new GUIStyle();
+        registerComplete = false;
     }
 
     void Update()
@@ -131,7 +131,7 @@ public class RegistrationPage : Photon.PunBehaviour
             PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
     }
 
-    void RegistrationReceive(byte eventCode, object content, int senderID)
+    public static void RegistrationReceive(byte eventCode, object content, int senderID)
     {
         if (eventCode != (byte)EvCode.REGISTRATION || senderID > 0)
             return;

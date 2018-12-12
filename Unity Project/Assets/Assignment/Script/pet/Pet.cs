@@ -44,9 +44,11 @@ public class Pet : Photon.MonoBehaviour
             //Update remote player (smooth this, this looks good, at the cost of some accuracy)
             transform.position = Vector3.Lerp(transform.position, correctPos, Time.deltaTime * 5);
         }
-
-        transform.position = Vector3.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
-        // saving the pet's position
-        Player.GetInstance().SetPetPosition(gameObject.transform.position);
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
+            // saving the pet's position
+            Player.GetInstance().SetPetPosition(gameObject.transform.position);
+        }
 	}
 }

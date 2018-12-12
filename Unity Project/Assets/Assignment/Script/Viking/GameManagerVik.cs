@@ -51,6 +51,8 @@ public class GameManagerVik : Photon.MonoBehaviour {
             Logout();
 
             UnityEngine.SceneManagement.SceneManager.LoadScene("InitServer");
+            Player.GetInstance().ResetPlayer();
+            InitReceiveFunc.RemoveEventCalls();
             PhotonNetwork.LeaveRoom();
         }
     }
@@ -67,6 +69,8 @@ public class GameManagerVik : Photon.MonoBehaviour {
     private void OnApplicationQuit()
     {
         Logout();
+        Player.GetInstance().ResetPlayer();
+        InitReceiveFunc.RemoveEventCalls();
     }
 
     void OnDisconnectedFromPhoton()

@@ -80,6 +80,11 @@ namespace TestPlugin
                         UpdateItem(info);
                         break;
                     }
+                case (byte)EvCode.INIT_INVENTORY:
+                    {
+                        InitInventory(info);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -329,17 +334,25 @@ namespace TestPlugin
 
         void InitInventory(IRaiseEventCallInfo info)
         {
-            string sql = "SELECT * FROM account WHERE username ='" + message[0] + "'";
+            string message = (string)info.Request.Data;
+
+            string sql = "SELECT * FROM item WHERE account_id ='" + message + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
             int[] itemIDs = new int[9];
-            if (rdr.Read())
-            {
+            // init the items to be -1 (no item there)
+            for (int index = 0; index < itemIDs.Length; ++index)
+                itemIDs[index] = -1;
 
+            // getting the data from the db
+            int i = 0;
+            while (rdr.Read())
+            {
+                itemIDs[i] = rdr.GetInt32(0);
+                ++i;
             }
             rdr.Close();
-
 
             // returns the message to the client
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
@@ -366,7 +379,7 @@ namespace TestPlugin
                 };
 
                 // insert into db
-                sql = "INSERT INTO item (account_id) VALUES ('" + message[1] + "'";
+                sql = "INSERT INTO item (account_id) VALUES ('" + message[1] + "')";
                 cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
 

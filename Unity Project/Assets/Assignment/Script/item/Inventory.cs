@@ -1,42 +1,44 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class Inventory : MonoBehaviour
+public class Inventory : Photon.MonoBehaviour
 {
     public GameObject inventory;
-    public GameObject[] items = new GameObject[Player.GetInstance().GetInventorySize()];
-    Image[] itemImages;
+    public Image[] itemImages = new Image[9];
     // only spawning cubes for this assignment, so can do this
     public Sprite[] defaultSprite = new Sprite[2];
 
     void Awake()
     {
-        PhotonNetwork.OnEventCall += UpdateItemReceive;
-        PhotonNetwork.OnEventCall += InitInventoryReceive;
+
     }
 
     void Start ()
     {
-        for (int i = 0; i < Player.GetInstance().GetInventorySize(); ++i)
-            itemImages[i] = items[i].GetComponent<Image>();
-
         // make sure this is set to false
         inventory.SetActive(false);
         Player.GetInstance().SetInventory(this);
 
         // init the inventory when player log into the game
-        InitInventory();
+        StartCoroutine(ProcessInventory());
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if (Input.GetKey(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.I))
             InventoryState();
 
-        if (Input.GetKey(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
             SpawnItem();
 	}
+
+    IEnumerator ProcessInventory()
+    {
+        yield return new WaitForSeconds(1.0f);
+        InitInventory();
+    }
 
     // open/close inventory
     void InventoryState()
@@ -47,13 +49,13 @@ public class Inventory : MonoBehaviour
     // make the look of invetory to have items start from index 0
     public void InventoryLook()
     {
-        // just gonna hard code here first
-        // set the cube image
-        for (int i = 0; i < Player.GetInstance().GetInventorySize(); ++i)
-            itemImages[i].sprite = defaultSprite[1];
-
-        for (int i = Player.GetInstance().GetInventorySize() - 1; i >= Player.GetInstance().GetItemCount(); --i)
+        // set all the item box in inventory to the box sprite
+        for(int i = 0; i < Player.GetInstance().GetInventorySize(); ++i)
             itemImages[i].sprite = defaultSprite[0];
+
+        // set the cube image
+        for (int i = 0; i < Player.GetInstance().GetItemCount(); ++i)
+            itemImages[i].sprite = defaultSprite[1];
     }
 
     // spawn item in inventory
@@ -63,14 +65,13 @@ public class Inventory : MonoBehaviour
         UpdateItem("INSERT"); 
     }
 
-    void InitInventoryReceive(byte eventCode, object content, int senderID)
+    public static void InitInventoryReceive(byte eventCode, object content, int senderID)
     {
         if (eventCode != (byte)EvCode.INIT_INVENTORY || senderID > 0)
             return;
 
         int[] itemIDs = (int[])content;
-        for(int i = 0; i < itemIDs.Length; ++i)
-            Player.GetInstance().AddItem(itemIDs[i]);
+        Player.GetInstance().SetItems(itemIDs);
     }
 
     void InitInventory()
@@ -82,9 +83,9 @@ public class Inventory : MonoBehaviour
         PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
     }
 
-    void UpdateItemReceive(byte eventCode, object content, int senderID)
+    public static void UpdateItemReceive(byte eventCode, object content, int senderID)
     {
-        if (eventCode != (byte)EvCode.LOGIN || senderID > 0)
+        if (eventCode != (byte)EvCode.UPDATE_ITEM || senderID > 0)
             return;
 
         string[] message = (string[])content;
