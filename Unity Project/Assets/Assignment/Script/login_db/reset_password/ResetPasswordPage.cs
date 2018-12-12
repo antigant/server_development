@@ -1,31 +1,30 @@
 ﻿using UnityEngine;
 using CustomPlugin;
 
-public class RegistrationPage : Photon.PunBehaviour
+public class ResetPasswordPage : MonoBehaviour
 {
     string username = "";
     string password = "";
     string confirmPassword = "";
-    string playerName = "";
-    // display the message from server
+    string prevPassword = "";
+
+    bool resetPasswordComplete;
+    float dt = 0.0f;
 
     GUIStyle textStyle;
-
-    bool registerComplete = false;
-    float dt = 0.0f;
 
     void Awake()
     {
         //Set camera clipping for nicer "main menu" background
         Camera.main.farClipPlane = Camera.main.nearClipPlane + 0.1f;
 
-        PhotonNetwork.OnEventCall += RegistrationReceive;
+        PhotonNetwork.OnEventCall += ResetPasswordReceive;
         textStyle = new GUIStyle();
     }
 
     void Update()
     {
-        if (!registerComplete)
+        if (!resetPasswordComplete)
             return;
 
         dt += Time.deltaTime;
@@ -52,6 +51,18 @@ public class RegistrationPage : Photon.PunBehaviour
         username = GUILayout.TextField(username);
         GUILayout.EndHorizontal();
 
+        // Previous password
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Previous Password:", GUILayout.Width(90));
+        if (prevPassword == null)
+        {
+            prevPassword = GUILayout.TextField("password");
+            prevPassword = "";
+        }
+        else
+            prevPassword = GUILayout.PasswordField(prevPassword, '*', 15);
+        GUILayout.EndHorizontal();
+
         // Password
         GUILayout.BeginHorizontal();
         GUILayout.Label("Password:", GUILayout.Width(90));
@@ -76,50 +87,32 @@ public class RegistrationPage : Photon.PunBehaviour
             confirmPassword = GUILayout.PasswordField(confirmPassword, '*', 15);
         GUILayout.EndHorizontal();
 
-        // Player info
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Character Name:", GUILayout.Width(90));
-        playerName = GUILayout.TextField(playerName);
-        GUILayout.EndHorizontal();
-
         GUILayout.Space(15);
         textStyle.normal.textColor = Color.red;
         GUILayout.Label(General.Message, textStyle);
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Register"))
+        if (GUILayout.Button("Reset Password"))
         {
-            Registration();
+            ResetPassword();
         }
         GUILayout.EndHorizontal();
 
         GUILayout.EndArea();
     }
 
-    // send message to server
-    void Registration()
+    void ResetPassword()
     {
-        byte evCode = (byte)EvCode.REGISTRATION;
-        string[] content = { username.ToLower(), password, playerName };
+        byte evCode = (byte)EvCode.RESET_PASSWORD;
+        string[] content = { username.ToLower(), password, prevPassword };
         bool reliable = true;
 
         bool ready = false;
 
-        if (username != "" && password != "" && confirmPassword != "" && playerName != "")
+        if (username != "" && password != "" && confirmPassword != "" && prevPassword != "")
         {
             if (password == confirmPassword)
-            {
-                int maxChar = 15;
-                if (playerName.Length <= maxChar)
-                {
-                    if(username.Length <= maxChar)
-                        ready = true;
-                    else
-                        General.Message = "Username has to be less than " + maxChar + " characters";
-                }
-                else
-                    General.Message = "Character name has to be less than " + maxChar + " characters";
-            }
+                ready = true;
             else
                 General.Message = "Password does not match";
         }
@@ -131,15 +124,15 @@ public class RegistrationPage : Photon.PunBehaviour
             PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
     }
 
-    void RegistrationReceive(byte eventCode, object content, int senderID)
+    void ResetPasswordReceive(byte eventCode, object content, int senderID)
     {
-        if (eventCode != (byte)EvCode.REGISTRATION || senderID > 0)
+        if (eventCode != (byte)EvCode.RESET_PASSWORD || senderID > 0)
             return;
 
         string message = "";
         message = (string)content;
-        if(message[0] == 'S')
-            registerComplete = true;
+        if (message[0] == 'S')
+            resetPasswordComplete = true;
 
         General.Message = General.GetStringDataFromMessage(message, "Message");
     }
