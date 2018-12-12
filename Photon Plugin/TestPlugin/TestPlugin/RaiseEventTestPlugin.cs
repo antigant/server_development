@@ -70,7 +70,11 @@ namespace TestPlugin
                         Logout(info);
                         break;
                     }
-
+                case (byte)EvCode.RESET_PASSWORD:
+                    {
+                        ResetPassword(info);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -237,7 +241,7 @@ namespace TestPlugin
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
 
-                returnMessage = "Successful, Message=Registration Complete";
+                returnMessage = "Successful, Message=Registration Complete!";
             }
 
             // returns the message to the client
@@ -265,6 +269,57 @@ namespace TestPlugin
             sql = "DELETE FROM active_users WHERE account_id = '" + message[0] + "'";
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
+        }
+
+        void ResetPassword(IRaiseEventCallInfo info)
+        {
+            string[] message = (string[])info.Request.Data;
+            string sql = "SELECT * FROM account WHERE username ='" + message[0] + "'";
+            MySqlCommand cmd = new MySqlCommand(sql, conn);
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            bool accExist = false;
+            if (rdr.HasRows)
+                accExist = true;
+            rdr.Close();
+
+            string returnMessage = "";
+            // update the password
+            if (accExist)
+            {
+                string prevPassword = "";
+                // check previous password if correct
+                rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                    prevPassword = rdr.GetString(2);
+                rdr.Close();
+
+                // check if prev match with the user
+                bool matches = false;
+                if (prevPassword == message[2])
+                    matches = true;
+                if (matches)
+                {
+                    // update the password
+                    sql = "UPDATE account SET password='" + message[1] + "' WHERE username ='" + message[0] + "'";
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
+
+                    returnMessage = "Successful, Message=Password Reset!";
+                }
+                else
+                    returnMessage = "Unsucessful, Message=Previous Password does not match";
+            }
+            // return a message to tell the user no such account exist
+            else
+                returnMessage = "Unsuccessful, Message=Account does not exist";
+
+            // returns the message to the client
+            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+                senderActor: 0,
+                evCode: info.Request.EvCode,
+                data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                cacheOp: CacheOperations.DoNotCache);
         }
 
         // ----- Open connection to 
