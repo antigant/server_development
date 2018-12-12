@@ -125,6 +125,12 @@ public class Player
         return item.Length;
     }
 
+    // check if there's item
+    public bool HasItem(int index)
+    {
+        return item[index] > -1;
+    }
+
     public void AddItem(int itemID)
     {
         // do not add if item is more than the what it can hold LOL stupid mistake

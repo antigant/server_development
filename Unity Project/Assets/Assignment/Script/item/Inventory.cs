@@ -36,7 +36,7 @@ public class Inventory : Photon.MonoBehaviour
 
     IEnumerator ProcessInventory()
     {
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(2.0f);
         InitInventory();
     }
 
@@ -71,6 +71,9 @@ public class Inventory : Photon.MonoBehaviour
             return;
 
         int[] itemIDs = (int[])content;
+        //Item[] items = new Item[itemIDs.Length];
+        //for (int i = 0; i < itemIDs.Length; ++i)
+        //    items[i].id = itemIDs[i];
         Player.GetInstance().SetItems(itemIDs);
     }
 
