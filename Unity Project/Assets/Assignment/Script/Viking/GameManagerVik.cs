@@ -59,6 +59,11 @@ public class GameManagerVik : Photon.MonoBehaviour {
 
     public void Logout()
     {
+        LogoutEvent();
+    }
+
+    void LogoutEvent()
+    {
         byte evCode = (byte)EvCode.LOGOUT;
         // logout to save player and pet position
         string[] content = { Player.GetInstance().GetAccountID().ToString(), Player.GetInstance().GetPosition().x.ToString(), Player.GetInstance().GetPosition().y.ToString(), Player.GetInstance().GetPosition().z.ToString(), Player.GetInstance().GetPetPosition().x.ToString(), Player.GetInstance().GetPetPosition().y.ToString(), Player.GetInstance().GetPetPosition().z.ToString() };

@@ -30,7 +30,7 @@ public class Inventory : Photon.MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
             InventoryState();
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Alpha2))
             SpawnItem();
 	}
 
@@ -101,7 +101,7 @@ public class Inventory : Photon.MonoBehaviour
     }
 
     // calls the plugin to store it in the database
-    public void UpdateItem(string messageType, int itemID = 0, int account_id = -1)
+    public void UpdateItem(string messageType, int itemID = 0, int account_id = 0)
     {
         byte evCode = (byte)EvCode.UPDATE_ITEM;
 

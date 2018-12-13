@@ -4,64 +4,38 @@ using UnityEngine;
 // using this script when only the player drop an item
 public class Item : Photon.MonoBehaviour
 {
-    public DestroyItem destroyItem;
-
-    int id = -1;
-    int multiplier = 1;
-    float yPos;
-    float originalYPos;
-    float dt = 0.0f;
     // check if this gameObject is still "alive"
-    bool alive = true;
-    bool updated = false;
+    public int id = -1;
 
     // time before the item despawn
+    float dt = 0.0f;
     readonly float timeAlive = 10.0f;
-    readonly float rotateSpeed = 1.0f;
-    readonly float moveSpeed = 0.25f;
-    readonly float maxDist = 0.25f;
+
+    private bool appliedInitialUpdate;
+    private Vector3 correctPos = Vector3.zero; //We lerp towards this
 
     void Start()
     {
-<<<<<<< HEAD
-        //Vector3 startPos = Player.GetInstance().GetPosition();
-        //startPos.y -= 0.6f;
-        //startPos.z += 0.6f;
-        //transform.position = startPos;
+        PhotonNetwork.OnEventCall += ItemState;
 
-        originalYPos = transform.position.y;
-        yPos = originalYPos;
+        transform.position = GameObject.FindGameObjectWithTag("item_drop_pos").transform.position;
 
-        rb = GetComponent<Rigidbody>();
-        //rb.AddForce(Player.GetInstance().GetForward() * 100.0f, ForceMode.Force);
-=======
-        originalYPos = transform.localPosition.y;
-        yPos = originalYPos;
->>>>>>> parent of b6cdd80... commiting to save my files before deleting DestroyItem
+        GetComponent<Rigidbody>().AddForce(Player.GetInstance().GetForward() * 125.0f, ForceMode.Force);
     }
 
     void Update()
     {
-        // if this is mine, i calculate the time left before this item despawn and send it to delete in the db
-        //if (photonView.isMine)
-        //{
-        //    dt += Time.deltaTime;
-        //    if (dt < timeAlive)
-        //        return;
+        if (!photonView.isMine)
+        {
+            transform.position = Vector3.Lerp(transform.position, correctPos, Time.deltaTime * 5);
+        }
+    }
 
-        //    alive = false;
-        //}
-
-        // should have the same code to rotate and "float" for all clients
-        if (yPos - originalYPos >= maxDist || yPos - originalYPos <= -maxDist)
-            multiplier *= -1;
-        yPos += moveSpeed * Time.deltaTime * multiplier;
-
-        transform.Rotate(0.0f, rotateSpeed, 0.0f);
-        transform.localPosition = new Vector3(transform.localPosition.x, yPos, transform.localPosition.z);
-
-        // set the state of this item
-        gameObject.SetActive(alive);
+    public void ItemState(byte eventCode, object content, int senderID)
+    {
+        if (eventCode != (byte)EvCode.ITEM_STATE || senderID > 0)
+            return;
+        DestroyItem();
     }
 
     void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -69,12 +43,18 @@ public class Item : Photon.MonoBehaviour
         if (stream.isWriting)
         {
             //We own this player: send the others our data
-            stream.SendNext(alive);
+            stream.SendNext(transform.position);
         }
         else
         {
             //Network player, receive data
-            alive = (bool)stream.ReceiveNext();
+            correctPos = (Vector3)stream.ReceiveNext();
+
+            if (!appliedInitialUpdate)
+            {
+                appliedInitialUpdate = true;
+                transform.position = correctPos;
+            }
         }
     }
 
@@ -87,19 +67,27 @@ public class Item : Photon.MonoBehaviour
         id = (int)objs[0];
     }
 
-    // when someone picks up the item
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponent<Collider>().tag != "Player")
-            return;
-
-        alive = false;
-        Player.GetInstance().GetInventory().UpdateItem("UPDATE", id, Player.GetInstance().GetAccountID());
-    }
-
     // only call this when timer runs out
     void DeleteItem()
     {
         Player.GetInstance().GetInventory().UpdateItem("DELETE", id);
+        DestroyItem();
+    }
+
+    public IEnumerator ProcessDestroyItem()
+    {
+        yield return new WaitForSeconds(0.2f);
+        DestroyItem();
+    }
+
+    void DestroyItem()
+    {
+        //gameObject.SetActive(false);
+        Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        PhotonNetwork.OnEventCall -= ItemState;
     }
 }

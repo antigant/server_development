@@ -16,15 +16,12 @@ public class Player
     int currItemSlot;
 
     // last position
-    Transform transform;
-    //Vector3 position;
+    Vector3 position;
     Vector3 petPosition;
+    Vector3 forward;
 
     // inventory
     Inventory inventory;
-
-    // item
-    //Vector3 playerForward;
 
     // Protect another object from being instantiate
     private Player(int id, string name)
@@ -64,19 +61,19 @@ public class Player
     }
 
     // setter
-    //public void SetPosition(Vector3 pos)
-    //{
-    //    position = pos;
-    //}
-
-    public void SetTransform(Transform trans)
+    public void SetPosition(Vector3 pos)
     {
-        transform = trans;
+        position = pos;
     }
 
     public void SetPetPosition(Vector3 pos)
     {
         petPosition = pos;
+    }
+
+    public void SetForward(Vector3 fw)
+    {
+        forward = fw;
     }
 
     public void SetInventory(Inventory invent)
@@ -93,14 +90,10 @@ public class Player
             if (item[i] == -1)
                 break;
             ++itemCount;
+            ++currItemSlot;
         }
         inventory.InventoryLook();
     }
-
-    //public void SetPlayerForward(Vector3 forward)
-    //{
-    //    playerForward = forward;
-    //}
 
     // getter
     public string GetPlayerName()
@@ -115,7 +108,7 @@ public class Player
 
     public Vector3 GetPosition()
     {
-        return transform.position;
+        return position;
     }
 
     public Vector3 GetPetPosition()
@@ -149,7 +142,7 @@ public class Player
 
     public Vector3 GetForward()
     {
-        return transform.forward;
+        return forward;
     }
 
     // check if there's item
@@ -189,8 +182,8 @@ public class Player
         // using this loop to rearrange the item in the array
         for (int i = slotRemoved; i < item.Length - 1; ++i)
         {
-            item[i] = item[++i];
-            item[++i] = -1;
+            item[i] = item[i + 1];
+            item[i + 1] = -1;
         }
 
         // return if no item is deleted, won't update the inventory

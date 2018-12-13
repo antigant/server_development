@@ -405,11 +405,25 @@ namespace TestPlugin
                 sql = "UPDATE item SET account_id='" + message[3] + "' WHERE item_id='" + message[2] + "'";
                 cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
+
+                if (message[0][1] == '1')
+                    return;
+
+                // send back a message to tell the client to off the active state of the item
+                PluginHost.BroadcastEvent(target: ReciverGroup.All,
+                                          senderActor: 0,
+                                          targetGroup: 0,
+                                          data: new Dictionary<byte, object>() { { 245, false } },
+                                          evCode: (byte)EvCode.ITEM_STATE,
+                                          cacheOp: 0);
             }
-            else if(message[0][0] == 'D')
-            {
-                // delete the item where item_id is the one received
-            }
+            //else if(message[0][0] == 'D')
+            //{
+            //    // delete the item where item_id is the one received
+            //    sql = "DELETE FROM item WHERE item_id ='" + message[2] + "'";
+            //    cmd = new MySqlCommand(sql, conn);
+            //    cmd.ExecuteNonQuery();
+            //}
         }
 
         // ----- Open connection to 
