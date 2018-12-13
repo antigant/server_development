@@ -3,8 +3,6 @@
 // using this script when only the player drop an item
 public class Item : Photon.MonoBehaviour
 {
-    public DestroyItem destroyItem;
-
     int id = -1;
     int multiplier = 1;
     float yPos;
@@ -20,10 +18,20 @@ public class Item : Photon.MonoBehaviour
     readonly float moveSpeed = 0.25f;
     readonly float maxDist = 0.25f;
 
+    Rigidbody rb;
+
     void Start()
     {
-        originalYPos = transform.localPosition.y;
+        Vector3 startPos = Player.GetInstance().GetPosition();
+        startPos.y -= 0.6f;
+        startPos.z += 0.6f;
+        transform.position = startPos;
+
+        originalYPos = transform.position.y;
         yPos = originalYPos;
+
+        rb = GetComponent<Rigidbody>();
+        rb.AddForce(Player.GetInstance().GetForward() * 100.0f, ForceMode.Force);
     }
 
     void Update()
@@ -44,7 +52,7 @@ public class Item : Photon.MonoBehaviour
         yPos += moveSpeed * Time.deltaTime * multiplier;
 
         transform.Rotate(0.0f, rotateSpeed, 0.0f);
-        transform.localPosition = new Vector3(transform.localPosition.x, yPos, transform.localPosition.z);
+        transform.position = new Vector3(transform.position.x, yPos, transform.position.z);
 
         // set the state of this item
         gameObject.SetActive(alive);

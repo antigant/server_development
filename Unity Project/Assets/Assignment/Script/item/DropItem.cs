@@ -12,12 +12,14 @@ public class DropItem : Photon.MonoBehaviour
     {
         int itemID = Player.GetInstance().GetItemID(index);
         Player.GetInstance().GetInventory().UpdateItem("UPDATE", itemID);
+        // removing this item from the player
+        Player.GetInstance().RemoveItem(itemID);
 
         object[] objs = new object[1];
         objs[0] = itemID;
 
         PhotonNetwork.Instantiate(itemPrefabName, transform.position, Quaternion.identity, 0, objs);
         dropImage.SetActive(false);
-        Debug.Log(itemID);
+        //Debug.Log(itemID);
     }
 }

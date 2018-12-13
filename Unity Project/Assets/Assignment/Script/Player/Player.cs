@@ -8,23 +8,22 @@ public class Player
     readonly int accountID;
     // name of the character in the game
     string playerName;
+
+    /// last position
+    Vector3 position;
+    Vector3 forward;
+    Vector3 petPosition;
+
+    /// inventory
+    Inventory inventory;
+
+    /// item
     // store the item_id of the item
     int[] item;
     // number of item in the arary item (can technically use currItemSlot but I will just create another var for future expansion)
     int itemCount;
     // curr available slot
     int currItemSlot;
-
-    // last position
-    Transform transform;
-    //Vector3 position;
-    Vector3 petPosition;
-
-    // inventory
-    Inventory inventory;
-
-    // item
-    //Vector3 playerForward;
 
     // Protect another object from being instantiate
     private Player(int id, string name)
@@ -64,14 +63,14 @@ public class Player
     }
 
     // setter
-    //public void SetPosition(Vector3 pos)
-    //{
-    //    position = pos;
-    //}
-
-    public void SetTransform(Transform trans)
+    public void SetPosition(Vector3 pos)
     {
-        transform = trans;
+        position = pos;
+    }
+
+    public void SetForward(Vector3 fw)
+    {
+        forward = fw;
     }
 
     public void SetPetPosition(Vector3 pos)
@@ -97,11 +96,6 @@ public class Player
         inventory.InventoryLook();
     }
 
-    //public void SetPlayerForward(Vector3 forward)
-    //{
-    //    playerForward = forward;
-    //}
-
     // getter
     public string GetPlayerName()
     {
@@ -115,7 +109,7 @@ public class Player
 
     public Vector3 GetPosition()
     {
-        return transform.position;
+        return position;
     }
 
     public Vector3 GetPetPosition()
@@ -149,7 +143,7 @@ public class Player
 
     public Vector3 GetForward()
     {
-        return transform.forward;
+        return forward;
     }
 
     // check if there's item
