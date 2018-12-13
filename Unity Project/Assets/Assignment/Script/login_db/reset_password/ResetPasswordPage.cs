@@ -24,6 +24,9 @@ public class ResetPasswordPage : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+            ResetPassword();
+
         if (!resetPasswordComplete)
             return;
 

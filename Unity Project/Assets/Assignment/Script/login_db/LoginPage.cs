@@ -24,6 +24,12 @@ public class LoginPage : Photon.PunBehaviour
         textStyle = new GUIStyle();
     }
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+            Login();
+    }
+
     void OnGUI()
     {
         if (GUILayout.Button("Quit Game"))

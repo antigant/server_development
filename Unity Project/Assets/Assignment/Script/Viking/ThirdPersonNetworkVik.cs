@@ -80,7 +80,7 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, correctPlayerRot, Time.deltaTime * 5);
         }
         else
-            Player.GetInstance().SetPosition(gameObject.transform.position);
+            Player.GetInstance().SetTransform(gameObject.transform);
     }
 
     void OnPhotonInstantiate(PhotonMessageInfo info)

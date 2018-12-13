@@ -16,11 +16,15 @@ public class Player
     int currItemSlot;
 
     // last position
-    Vector3 position;
+    Transform transform;
+    //Vector3 position;
     Vector3 petPosition;
 
     // inventory
     Inventory inventory;
+
+    // item
+    //Vector3 playerForward;
 
     // Protect another object from being instantiate
     private Player(int id, string name)
@@ -55,14 +59,19 @@ public class Player
         itemCount = 0;
 
         // Delete this later
-        position = Vector3.zero;
+        //position = Vector3.zero;
         petPosition = Vector3.zero;
     }
 
     // setter
-    public void SetPosition(Vector3 pos)
+    //public void SetPosition(Vector3 pos)
+    //{
+    //    position = pos;
+    //}
+
+    public void SetTransform(Transform trans)
     {
-        position = pos;
+        transform = trans;
     }
 
     public void SetPetPosition(Vector3 pos)
@@ -88,6 +97,11 @@ public class Player
         inventory.InventoryLook();
     }
 
+    //public void SetPlayerForward(Vector3 forward)
+    //{
+    //    playerForward = forward;
+    //}
+
     // getter
     public string GetPlayerName()
     {
@@ -101,7 +115,7 @@ public class Player
 
     public Vector3 GetPosition()
     {
-        return position;
+        return transform.position;
     }
 
     public Vector3 GetPetPosition()
@@ -109,7 +123,7 @@ public class Player
         return petPosition;
     }
 
-    public Inventory GetInventroy()
+    public Inventory GetInventory()
     {
         return inventory;
     }
@@ -123,6 +137,19 @@ public class Player
     public int GetInventorySize()
     {
         return item.Length;
+    }
+
+    // get the item id on that current index
+    public int GetItemID(int index = -1)
+    {
+        if (index <= -1)
+            return -1;
+        return item[index];
+    }
+
+    public Vector3 GetForward()
+    {
+        return transform.forward;
     }
 
     // check if there's item

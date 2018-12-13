@@ -80,7 +80,7 @@ public class ChatVik : Photon.MonoBehaviour
     [PunRPC]
     void SendChatMessage(string text, PhotonMessageInfo info)
     {
-        AddMessage("[" + Player.GetInstance().GetPlayerName() + "] " + text);
+        AddMessage("[" + info.sender + "] " + text);
     }
 
     void SendChat(PhotonTargets target)

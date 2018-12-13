@@ -402,6 +402,13 @@ namespace TestPlugin
             else if(message[0][0] == 'U')
             {
                 // update the account_id when player drop/pick_up the item
+                sql = "UPDATE item SET account_id='" + message[3] + "' WHERE item_id='" + message[2] + "'";
+                cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+            }
+            else if(message[0][0] == 'D')
+            {
+                // delete the item where item_id is the one received
             }
         }
 

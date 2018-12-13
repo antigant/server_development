@@ -101,7 +101,7 @@ public class Inventory : Photon.MonoBehaviour
     }
 
     // calls the plugin to store it in the database
-    void UpdateItem(string messageType, int itemID = 0)
+    public void UpdateItem(string messageType, int itemID = 0, int account_id = -1)
     {
         byte evCode = (byte)EvCode.UPDATE_ITEM;
 
@@ -109,7 +109,7 @@ public class Inventory : Photon.MonoBehaviour
         if (itemID <= 0)
             item_id = "NULL";
 
-        string[] content = { messageType, Player.GetInstance().GetAccountID().ToString(), item_id };
+        string[] content = { messageType, Player.GetInstance().GetAccountID().ToString(), item_id, account_id.ToString() };
         bool reliable = true;
         PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
     }

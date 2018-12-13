@@ -29,10 +29,13 @@ public class MainMenuVik : MonoBehaviour
         if (dt < 1.25f)
             return;
 
+        string playerName = Player.GetInstance().GetPlayerName();
+
         RoomOptions options = new RoomOptions();
         options.MaxPlayers = 0;
         PhotonNetwork.AuthValues = new AuthenticationValues();
-        PhotonNetwork.AuthValues.UserId = Player.GetInstance().GetPlayerName();
+        PhotonNetwork.AuthValues.UserId = playerName;
+        PhotonNetwork.playerName = playerName;
 
         PhotonNetwork.JoinOrCreateRoom("GameRoom", options, TypedLobby.Default);
         gameObject.SetActive(false);

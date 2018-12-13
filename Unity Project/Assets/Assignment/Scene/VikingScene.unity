@@ -828,6 +828,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 1
+  dropImage: {fileID: 1323565191}
 --- !u!114 &899611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -851,6 +852,7 @@ GameObject:
   - component: {fileID: 21309073}
   - component: {fileID: 21309075}
   - component: {fileID: 21309074}
+  - component: {fileID: 21309076}
   m_Layer: 5
   m_Name: Drop (5)
   m_TagString: Untagged
@@ -911,6 +913,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 21309072}
   m_CullTransparentMesh: 0
+--- !u!114 &21309076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 21309072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 302274575}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &29376098
 GameObject:
   m_ObjectHideFlags: 0
@@ -921,6 +953,7 @@ GameObject:
   - component: {fileID: 29376099}
   - component: {fileID: 29376101}
   - component: {fileID: 29376100}
+  - component: {fileID: 29376102}
   m_Layer: 5
   m_Name: Drop (8)
   m_TagString: Untagged
@@ -981,6 +1014,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 29376098}
   m_CullTransparentMesh: 0
+--- !u!114 &29376102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 29376098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2113888220}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &61643797
 GameObject:
   m_ObjectHideFlags: 0
@@ -1028,6 +1091,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 0
+  dropImage: {fileID: 1313706601}
 --- !u!114 &61643800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1338,6 +1402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 5
+  dropImage: {fileID: 21309072}
 --- !u!114 &302274576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1427,7 +1492,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 229.50002, y: -136}
+  m_AnchoredPosition: {x: 229.5, y: -136}
   m_SizeDelta: {x: 3, y: 3}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &342511163
@@ -1629,6 +1694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 4
+  dropImage: {fileID: 430057285}
 --- !u!114 &360895515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1809,6 +1875,7 @@ GameObject:
   - component: {fileID: 428955733}
   - component: {fileID: 428955735}
   - component: {fileID: 428955734}
+  - component: {fileID: 428955736}
   m_Layer: 5
   m_Name: Drop (3)
   m_TagString: Untagged
@@ -1869,6 +1936,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 428955732}
   m_CullTransparentMesh: 0
+--- !u!114 &428955736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 428955732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1656617342}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &430057285
 GameObject:
   m_ObjectHideFlags: 0
@@ -1879,6 +1976,7 @@ GameObject:
   - component: {fileID: 430057286}
   - component: {fileID: 430057288}
   - component: {fileID: 430057287}
+  - component: {fileID: 430057289}
   m_Layer: 5
   m_Name: Drop (4)
   m_TagString: Untagged
@@ -1939,6 +2037,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 430057285}
   m_CullTransparentMesh: 0
+--- !u!114 &430057289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 430057285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 360895514}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &464151899
 GameObject:
   m_ObjectHideFlags: 0
@@ -2414,6 +2542,7 @@ GameObject:
   - component: {fileID: 640740982}
   - component: {fileID: 640740984}
   - component: {fileID: 640740983}
+  - component: {fileID: 640740985}
   m_Layer: 5
   m_Name: Drop (6)
   m_TagString: Untagged
@@ -2474,6 +2603,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 640740981}
   m_CullTransparentMesh: 0
+--- !u!114 &640740985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 640740981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 701459244}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &684946975
 GameObject:
   m_ObjectHideFlags: 0
@@ -2484,6 +2643,7 @@ GameObject:
   - component: {fileID: 684946976}
   - component: {fileID: 684946978}
   - component: {fileID: 684946977}
+  - component: {fileID: 684946979}
   m_Layer: 5
   m_Name: Drop (2)
   m_TagString: Untagged
@@ -2544,6 +2704,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 684946975}
   m_CullTransparentMesh: 0
+--- !u!114 &684946979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 684946975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 821647420}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &701459242
 GameObject:
   m_ObjectHideFlags: 0
@@ -2591,6 +2781,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 6
+  dropImage: {fileID: 640740981}
 --- !u!114 &701459245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2841,6 +3032,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 2
+  dropImage: {fileID: 684946975}
 --- !u!114 &821647421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3965,6 +4157,7 @@ GameObject:
   - component: {fileID: 1313706602}
   - component: {fileID: 1313706604}
   - component: {fileID: 1313706603}
+  - component: {fileID: 1313706605}
   m_Layer: 5
   m_Name: Drop
   m_TagString: Untagged
@@ -4025,6 +4218,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1313706601}
   m_CullTransparentMesh: 0
+--- !u!114 &1313706605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1313706601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 61643799}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &1323565191
 GameObject:
   m_ObjectHideFlags: 0
@@ -4035,6 +4258,7 @@ GameObject:
   - component: {fileID: 1323565192}
   - component: {fileID: 1323565194}
   - component: {fileID: 1323565193}
+  - component: {fileID: 1323565195}
   m_Layer: 5
   m_Name: Drop (1)
   m_TagString: Untagged
@@ -4095,6 +4319,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1323565191}
   m_CullTransparentMesh: 0
+--- !u!114 &1323565195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1323565191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 899610}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &1461734059
 GameObject:
   m_ObjectHideFlags: 0
@@ -4642,6 +4896,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 3
+  dropImage: {fileID: 428955732}
 --- !u!114 &1656617343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5586,6 +5841,7 @@ GameObject:
   - component: {fileID: 1940098613}
   - component: {fileID: 1940098615}
   - component: {fileID: 1940098614}
+  - component: {fileID: 1940098616}
   m_Layer: 5
   m_Name: Drop (7)
   m_TagString: Untagged
@@ -5646,6 +5902,36 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1940098612}
   m_CullTransparentMesh: 0
+--- !u!114 &1940098616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1940098612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2024927013}
+          m_MethodName: Drop
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!1 &2024927011
 GameObject:
   m_ObjectHideFlags: 0
@@ -5693,6 +5979,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 7
+  dropImage: {fileID: 1940098612}
 --- !u!114 &2024927014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5753,6 +6040,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 8
+  dropImage: {fileID: 29376098}
 --- !u!114 &2113888221
 MonoBehaviour:
   m_ObjectHideFlags: 0

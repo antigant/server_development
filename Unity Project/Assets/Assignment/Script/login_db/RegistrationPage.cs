@@ -25,6 +25,9 @@ public class RegistrationPage : Photon.PunBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+            Registration();
+
         if (!registerComplete)
             return;
 
