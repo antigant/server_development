@@ -8,7 +8,7 @@ public class ResetPasswordPage : MonoBehaviour
     string confirmPassword = "";
     string prevPassword = "";
 
-    bool resetPasswordComplete;
+    static bool resetPasswordComplete;
     float dt = 0.0f;
 
     GUIStyle textStyle;
@@ -18,12 +18,15 @@ public class ResetPasswordPage : MonoBehaviour
         //Set camera clipping for nicer "main menu" background
         Camera.main.farClipPlane = Camera.main.nearClipPlane + 0.1f;
 
-        PhotonNetwork.OnEventCall += ResetPasswordReceive;
         textStyle = new GUIStyle();
+        resetPasswordComplete = false;
     }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+            ResetPassword();
+
         if (!resetPasswordComplete)
             return;
 
@@ -124,7 +127,7 @@ public class ResetPasswordPage : MonoBehaviour
             PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
     }
 
-    void ResetPasswordReceive(byte eventCode, object content, int senderID)
+    public static void ResetPasswordReceive(byte eventCode, object content, int senderID)
     {
         if (eventCode != (byte)EvCode.RESET_PASSWORD || senderID > 0)
             return;

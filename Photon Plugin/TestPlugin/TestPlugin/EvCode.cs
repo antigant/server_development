@@ -6,7 +6,8 @@
         REGISTRATION,
         LOGOUT,
         RESET_PASSWORD,
-
-        PHOTON_TEST = 100,
+        UPDATE_ITEM,
+        INIT_INVENTORY,
+        ITEM_STATE, // Using this to receive message from plugin to turn off the active state
     }
 }

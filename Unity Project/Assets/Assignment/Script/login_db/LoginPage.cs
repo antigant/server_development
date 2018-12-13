@@ -21,9 +21,13 @@ public class LoginPage : Photon.PunBehaviour
         //Set camera clipping for nicer "main menu" background
         Camera.main.farClipPlane = Camera.main.nearClipPlane + 0.1f;
 
-        PhotonNetwork.OnEventCall += LoginReceive;
-
         textStyle = new GUIStyle();
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Return))
+            Login();
     }
 
     void OnGUI()
@@ -96,13 +100,12 @@ public class LoginPage : Photon.PunBehaviour
     }
 
     // Use this to receive message from server
-    void LoginReceive(byte eventCode, object content, int senderID)
+    public static void LoginReceive(byte eventCode, object content, int senderID)
     {
         if (eventCode != (byte)EvCode.LOGIN || senderID > 0)
             return;
 
-        string[] message;
-        message = (string[])content;
+        string[] message = (string[])content;
         // Successful
         if (message[0][0] == 'S')
         {
@@ -110,7 +113,7 @@ public class LoginPage : Photon.PunBehaviour
             int accountID = System.Convert.ToInt32(message[1]);
             string playerName = message[2];
             // Init the player
-            Player.GetInstance(accountID, playerName, true);
+            Player.GetInstance(accountID, playerName, force: true);
 
             // player position
             float pos_x = System.Convert.ToSingle(message[3]);

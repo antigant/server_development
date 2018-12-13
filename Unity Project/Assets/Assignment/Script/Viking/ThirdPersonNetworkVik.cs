@@ -35,8 +35,9 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
         }
         controllerScript.SetIsRemotePlayer(!photonView.isMine);
 
-        gameObject.name = gameObject.name + photonView.viewID;
+        //gameObject.name = gameObject.name + photonView.viewID;
         gameObject.transform.position = Player.GetInstance().GetPosition();
+        gameObject.name = Player.GetInstance().GetPlayerName();
     }
 
     void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -80,7 +81,10 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, correctPlayerRot, Time.deltaTime * 5);
         }
         else
-            Player.GetInstance().SetPosition(gameObject.transform.position);
+        {
+            Player.GetInstance().SetPosition(transform.position);
+            Player.GetInstance().SetForward(transform.forward);
+        }
     }
 
     void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -96,4 +100,18 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
 
     }
 
+    // should even work here when another client pick up, but im just gonna cheat this part
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!photonView.isMine || collision.transform.tag != "item")
+            return;
+
+        Item item = collision.transform.GetComponent<Item>();
+
+        Player.GetInstance().GetInventory().UpdateItem("U2PDATE", item.id, Player.GetInstance().GetAccountID());
+        Player.GetInstance().AddItem(item.id);
+
+        //StartCoroutine(item.ProcessDestroyItem());
+        Debug.Log("Collision with item_id:" + item.id);
+    }
 }

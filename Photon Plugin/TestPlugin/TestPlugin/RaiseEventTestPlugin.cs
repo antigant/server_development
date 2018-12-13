@@ -75,6 +75,16 @@ namespace TestPlugin
                         ResetPassword(info);
                         break;
                     }
+                case (byte)EvCode.UPDATE_ITEM:
+                    {
+                        UpdateItem(info);
+                        break;
+                    }
+                case (byte)EvCode.INIT_INVENTORY:
+                    {
+                        InitInventory(info);
+                        break;
+                    }
                 default:
                     break;
             }
@@ -182,10 +192,10 @@ namespace TestPlugin
             }
 
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
-                senderActor: 0,
-                evCode: info.Request.EvCode,
-                data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
-                cacheOp: CacheOperations.DoNotCache);
+                                      senderActor: 0,
+                                      evCode: info.Request.EvCode,
+                                      data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                                      cacheOp: CacheOperations.DoNotCache);
         }
 
         void Registration(IRaiseEventCallInfo info)
@@ -246,10 +256,10 @@ namespace TestPlugin
 
             // returns the message to the client
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
-                senderActor: 0,
-                evCode: info.Request.EvCode,
-                data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
-                cacheOp: CacheOperations.DoNotCache);
+                                      senderActor: 0,
+                                      evCode: info.Request.EvCode,
+                                      data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                                      cacheOp: CacheOperations.DoNotCache);
         }
 
         void Logout(IRaiseEventCallInfo info)
@@ -316,10 +326,104 @@ namespace TestPlugin
 
             // returns the message to the client
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
-                senderActor: 0,
-                evCode: info.Request.EvCode,
-                data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
-                cacheOp: CacheOperations.DoNotCache);
+                                      senderActor: 0,
+                                      evCode: info.Request.EvCode,
+                                      data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                                      cacheOp: CacheOperations.DoNotCache);
+        }
+
+        void InitInventory(IRaiseEventCallInfo info)
+        {
+            string message = (string)info.Request.Data;
+
+            string sql = "SELECT * FROM item WHERE account_id ='" + message + "'";
+            MySqlCommand cmd = new MySqlCommand(sql, conn);
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            int[] itemIDs = new int[9];
+            // init the items to be -1 (no item there)
+            for (int index = 0; index < itemIDs.Length; ++index)
+                itemIDs[index] = -1;
+
+            // getting the data from the db
+            int i = 0;
+            while (rdr.Read())
+            {
+                itemIDs[i] = rdr.GetInt32(0);
+                ++i;
+            }
+            rdr.Close();
+
+            // returns the message to the client
+            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+                                      senderActor: 0,
+                                      evCode: info.Request.EvCode,
+                                      data: new Dictionary<byte, object>() { { 245, itemIDs }, { 254, 0 } },
+                                      cacheOp: CacheOperations.DoNotCache);
+        }
+
+        void UpdateItem(IRaiseEventCallInfo info)
+        {
+            // index 0: message type (eg. INSERT/UPDATE), 1: account_id, 2: item id (NULL if its inserting)
+            string[] message = (string[])info.Request.Data;
+
+            string sql = "";
+            MySqlCommand cmd;
+
+            if (message[0][0] == 'I')
+            {
+                string[] returnMessage = new string[2]
+                {
+                message[0],
+                "NULL",
+                };
+
+                // insert into db
+                sql = "INSERT INTO item (account_id) VALUES ('" + message[1] + "')";
+                cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+
+                // get the item_id and return to the player
+                sql = "SELECT * FROM item WHERE account_id='" + message[1] + "'";
+                cmd.CommandText = sql;
+                MySqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                    returnMessage[1] = rdr.GetInt32(0).ToString();
+                rdr.Close();
+
+                // returns the message to the client
+                PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+                                          senderActor: 0,
+                                          evCode: info.Request.EvCode,
+                                          data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                                          cacheOp: CacheOperations.DoNotCache);
+            }            
+            else if(message[0][0] == 'U')
+            {
+                // update the account_id when player drop/pick_up the item
+                sql = "UPDATE item SET account_id='" + message[3] + "' WHERE item_id='" + message[2] + "'";
+                cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+
+                if (message[0][1] == '1')
+                    return;
+
+                // send back a message to tell the client to off the active state of the item
+                PluginHost.BroadcastEvent(target: ReciverGroup.All,
+                                          senderActor: 0,
+                                          targetGroup: 0,
+                                          data: new Dictionary<byte, object>() { { 245, false } },
+                                          evCode: (byte)EvCode.ITEM_STATE,
+                                          cacheOp: 0);
+            }
+            //else if(message[0][0] == 'D')
+            //{
+            //    // delete the item where item_id is the one received
+            //    sql = "DELETE FROM item WHERE item_id ='" + message[2] + "'";
+            //    cmd = new MySqlCommand(sql, conn);
+            //    cmd.ExecuteNonQuery();
+            //}
         }
 
         // ----- Open connection to 

@@ -38,7 +38,7 @@ public class GameManagerVik : Photon.MonoBehaviour {
         objs[0] = enabledRenderers;
 
         // Spawn our local player
-        PhotonNetwork.Instantiate(this.playerPrefabName, transform.position, Quaternion.identity, 0, objs);
+        PhotonNetwork.Instantiate(playerPrefabName, transform.position, Quaternion.identity, 0, objs);
     }
 
     void OnGUI()
@@ -51,11 +51,18 @@ public class GameManagerVik : Photon.MonoBehaviour {
             Logout();
 
             UnityEngine.SceneManagement.SceneManager.LoadScene("InitServer");
+            Player.GetInstance().ResetPlayer();
+            InitReceiveFunc.RemoveEventCalls();
             PhotonNetwork.LeaveRoom();
         }
     }
 
     public void Logout()
+    {
+        LogoutEvent();
+    }
+
+    void LogoutEvent()
     {
         byte evCode = (byte)EvCode.LOGOUT;
         // logout to save player and pet position
@@ -67,6 +74,8 @@ public class GameManagerVik : Photon.MonoBehaviour {
     private void OnApplicationQuit()
     {
         Logout();
+        Player.GetInstance().ResetPlayer();
+        InitReceiveFunc.RemoveEventCalls();
     }
 
     void OnDisconnectedFromPhoton()
