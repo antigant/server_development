@@ -24,7 +24,8 @@ GameObject:
   - component: {fileID: 65090190855806632}
   - component: {fileID: 114843794012521368}
   - component: {fileID: 114054314947473608}
-  m_Layer: 0
+  - component: {fileID: 54462874087653932}
+  m_Layer: 11
   m_Name: Cubeprefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,6 +87,21 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1658707985724574}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!54 &54462874087653932
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1658707985724574}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!65 &65090190855806632
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -120,8 +136,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114843794012521368}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 1
-  instantiationId: 1
+  viewIdField: 0
+  instantiationId: -1
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!114 &114843794012521368
@@ -135,4 +151,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3f15a92296329245b4ce2d67814070d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyItem: {fileID: 0}

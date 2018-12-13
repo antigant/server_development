@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 // using this script when only the player drop an item
 public class Item : Photon.MonoBehaviour
@@ -22,16 +23,16 @@ public class Item : Photon.MonoBehaviour
 
     void Start()
     {
-        Vector3 startPos = Player.GetInstance().GetPosition();
-        startPos.y -= 0.6f;
-        startPos.z += 0.6f;
-        transform.position = startPos;
+        //Vector3 startPos = Player.GetInstance().GetPosition();
+        //startPos.y -= 0.6f;
+        //startPos.z += 0.6f;
+        //transform.position = startPos;
 
         originalYPos = transform.position.y;
         yPos = originalYPos;
 
         rb = GetComponent<Rigidbody>();
-        rb.AddForce(Player.GetInstance().GetForward() * 100.0f, ForceMode.Force);
+        //rb.AddForce(Player.GetInstance().GetForward() * 100.0f, ForceMode.Force);
     }
 
     void Update()
@@ -84,6 +85,9 @@ public class Item : Photon.MonoBehaviour
     // when someone picks up the item
     void OnTriggerEnter(Collider other)
     {
+        if (other.GetComponent<Collider>().tag != "Player")
+            return;
+
         alive = false;
         Player.GetInstance().GetInventory().UpdateItem("UPDATE", id, Player.GetInstance().GetAccountID());
     }
@@ -92,7 +96,5 @@ public class Item : Photon.MonoBehaviour
     void DeleteItem()
     {
         Player.GetInstance().GetInventory().UpdateItem("DELETE", id);
-        // remove the collder from the scene
-        destroyItem.DestoryThisItem();
     }
 }
