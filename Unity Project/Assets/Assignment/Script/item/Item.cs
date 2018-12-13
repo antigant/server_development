@@ -23,6 +23,7 @@ public class Item : Photon.MonoBehaviour
 
     void Start()
     {
+<<<<<<< HEAD
         //Vector3 startPos = Player.GetInstance().GetPosition();
         //startPos.y -= 0.6f;
         //startPos.z += 0.6f;
@@ -33,6 +34,10 @@ public class Item : Photon.MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
         //rb.AddForce(Player.GetInstance().GetForward() * 100.0f, ForceMode.Force);
+=======
+        originalYPos = transform.localPosition.y;
+        yPos = originalYPos;
+>>>>>>> parent of b6cdd80... commiting to save my files before deleting DestroyItem
     }
 
     void Update()
