@@ -40,6 +40,9 @@ public class MainMenuVik : MonoBehaviour
         PhotonNetwork.JoinOrCreateRoom("GameRoom", options, TypedLobby.Default);
         gameObject.SetActive(false);
         canvas.SetActive(true);
+
+        // play this audio
+        AudioManager.instance.PlayBGM(1, 0);
     }
 
     //private string roomName = "myRoom";

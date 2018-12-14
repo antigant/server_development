@@ -20,6 +20,8 @@ public class DropItem : Photon.MonoBehaviour
         PhotonNetwork.Instantiate(itemPrefabName, transform.position, Quaternion.identity, 0, objs);
         dropImage.SetActive(false);
 
+        AudioManager.instance.PlaySFX(1);
+
         Debug.Log("item_id dropped:" + itemID);
     }
 }
