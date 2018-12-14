@@ -9,11 +9,6 @@ public class Inventory : Photon.MonoBehaviour
     // only spawning cubes for this assignment, so can do this
     public Sprite[] defaultSprite = new Sprite[2];
 
-    void Awake()
-    {
-
-    }
-
     void Start ()
     {
         // make sure this is set to false
@@ -30,7 +25,7 @@ public class Inventory : Photon.MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
             InventoryState();
 
-        if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Alpha2))
+        if (Input.GetKeyDown(KeyCode.Alpha1))
             SpawnItem();
 	}
 

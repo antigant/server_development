@@ -449,6 +449,7 @@ MonoBehaviour:
   source:
   - {fileID: 698260518}
   - {fileID: 698260517}
+  mixer: {fileID: 24100000, guid: 3a682d5003ed615489e772e906ec6784, type: 2}
 --- !u!4 &698260520
 Transform:
   m_ObjectHideFlags: 0
