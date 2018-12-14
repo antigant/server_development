@@ -29,6 +29,14 @@ public class Item : Photon.MonoBehaviour
         {
             transform.position = Vector3.Lerp(transform.position, correctPos, Time.deltaTime * 5);
         }
+        else
+        {
+            // calculate the time it takes to despawn
+            dt += Time.deltaTime;
+            if (dt < timeAlive)
+                return;
+            DeleteItem();
+        }
     }
 
     public void ItemState(byte eventCode, object content, int senderID)
@@ -71,13 +79,6 @@ public class Item : Photon.MonoBehaviour
     void DeleteItem()
     {
         Player.GetInstance().GetInventory().UpdateItem("DELETE", id);
-        DestroyItem();
-    }
-
-    public IEnumerator ProcessDestroyItem()
-    {
-        yield return new WaitForSeconds(0.2f);
-        DestroyItem();
     }
 
     void DestroyItem()
