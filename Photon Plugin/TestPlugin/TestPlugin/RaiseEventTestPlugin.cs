@@ -139,8 +139,11 @@ namespace TestPlugin
                 accActive = true;
             rdr.Close();
 
-            string[] returnMessage = new string[9]
+            string[] returnMessage = new string[12]
             {
+                "NULL",
+                "NULL",
+                "NULL",
                 "NULL",
                 "NULL",
                 "NULL",
@@ -182,6 +185,18 @@ namespace TestPlugin
                     returnMessage[6] = rdr.GetFloat(1).ToString();
                     returnMessage[7] = rdr.GetFloat(2).ToString();
                     returnMessage[8] = rdr.GetFloat(3).ToString();
+                }
+                rdr.Close();
+
+                // get the audio settings
+                sql = "SELECT * FROM sound WHERE account_id='" + accountID + "'";
+                cmd.CommandText = sql;
+                rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    returnMessage[9] = rdr.GetFloat(1).ToString();
+                    returnMessage[10] = rdr.GetFloat(2).ToString();
+                    returnMessage[11] = rdr.GetFloat(3).ToString();
                 }
                 rdr.Close();
 
@@ -251,6 +266,10 @@ namespace TestPlugin
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
 
+                sql = "INSERT INTO sound (account_id, master, bgm, sfx) VALUES ('" + accountID + "', '0.0', '0.0', '0.0')";
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
+
                 returnMessage = "Successful, Message=Registration Complete!";
             }
 
@@ -273,6 +292,10 @@ namespace TestPlugin
             cmd.ExecuteNonQuery();
 
             sql = "UPDATE pet SET pos_x='" + message[4] + "', pos_y='" + message[5] + "', pos_z='" + message[6] + "' WHERE account_id ='" + message[0] + "'";
+            cmd.CommandText = sql;
+            cmd.ExecuteNonQuery();
+
+            sql = "UPDATE sound SET master='" + message[7] + "', bgm='" + message[8] + "', sfx='" + message[9] + "' WHERE account_id ='" + message[0] + "'";
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -374,8 +397,8 @@ namespace TestPlugin
             {
                 string[] returnMessage = new string[2]
                 {
-                message[0],
-                "NULL",
+                    message[0],
+                    "NULL",
                 };
 
                 // insert into db
@@ -398,6 +421,9 @@ namespace TestPlugin
                                           evCode: info.Request.EvCode,
                                           data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
                                           cacheOp: CacheOperations.DoNotCache);
+
+                // if the codes still run after sending message to client, return
+                return;
             }            
             else if(message[0][0] == 'U')
             {
@@ -409,21 +435,22 @@ namespace TestPlugin
                 if (message[0][1] == '1')
                     return;
 
-                // send back a message to tell the client to off the active state of the item
-                PluginHost.BroadcastEvent(target: ReciverGroup.All,
-                                          senderActor: 0,
-                                          targetGroup: 0,
-                                          data: new Dictionary<byte, object>() { { 245, false } },
-                                          evCode: (byte)EvCode.ITEM_STATE,
-                                          cacheOp: 0);
             }
-            //else if(message[0][0] == 'D')
-            //{
-            //    // delete the item where item_id is the one received
-            //    sql = "DELETE FROM item WHERE item_id ='" + message[2] + "'";
-            //    cmd = new MySqlCommand(sql, conn);
-            //    cmd.ExecuteNonQuery();
-            //}
+            else if (message[0][0] == 'D')
+            {
+                // delete the item where item_id is the one received
+                sql = "DELETE FROM item WHERE item_id ='" + message[2] + "'";
+                cmd = new MySqlCommand(sql, conn);
+                cmd.ExecuteNonQuery();
+            }
+
+            // send back a message to tell the clients to off the active state of the item
+            PluginHost.BroadcastEvent(target: ReciverGroup.All,
+                                      senderActor: 0,
+                                      targetGroup: 0,
+                                      data: new Dictionary<byte, object>() { { 245, false } },
+                                      evCode: (byte)EvCode.ITEM_STATE,
+                                      cacheOp: 0);
         }
 
         // ----- Open connection to 

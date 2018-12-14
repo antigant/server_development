@@ -111,7 +111,7 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
         Player.GetInstance().GetInventory().UpdateItem("U2PDATE", item.id, Player.GetInstance().GetAccountID());
         Player.GetInstance().AddItem(item.id);
 
-        //StartCoroutine(item.ProcessDestroyItem());
+        AudioManager.instance.PlaySFX(0);
         Debug.Log("Collision with item_id:" + item.id);
     }
 }

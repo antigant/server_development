@@ -66,7 +66,7 @@ public class GameManagerVik : Photon.MonoBehaviour {
     {
         byte evCode = (byte)EvCode.LOGOUT;
         // logout to save player and pet position
-        string[] content = { Player.GetInstance().GetAccountID().ToString(), Player.GetInstance().GetPosition().x.ToString(), Player.GetInstance().GetPosition().y.ToString(), Player.GetInstance().GetPosition().z.ToString(), Player.GetInstance().GetPetPosition().x.ToString(), Player.GetInstance().GetPetPosition().y.ToString(), Player.GetInstance().GetPetPosition().z.ToString() };
+        string[] content = { Player.GetInstance().GetAccountID().ToString(), Player.GetInstance().GetPosition().x.ToString(), Player.GetInstance().GetPosition().y.ToString(), Player.GetInstance().GetPosition().z.ToString(), Player.GetInstance().GetPetPosition().x.ToString(), Player.GetInstance().GetPetPosition().y.ToString(), Player.GetInstance().GetPetPosition().z.ToString(), AudioManager.instance.GetVolume(0).ToString(), AudioManager.instance.GetVolume(1).ToString(), AudioManager.instance.GetVolume(2).ToString() };
         bool reliable = true;
         PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
     }
