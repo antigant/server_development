@@ -26,7 +26,7 @@ public class MainMenuVik : MonoBehaviour
     void Update()
     {
         dt += Time.deltaTime;
-        if (dt < 1.25f)
+        if (dt < 1.75f)
             return;
 
         string playerName = Player.GetInstance().GetPlayerName();

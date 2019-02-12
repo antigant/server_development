@@ -8,7 +8,7 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
     ThirdPersonControllerNET controllerScript;
     private bool appliedInitialUpdate;
 
-    //GameObject marker;
+    GameObject marker;
 
     void Awake()
     {
@@ -28,9 +28,9 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
             Camera.main.transform.localPosition = new Vector3(0, 2, -10);
             Camera.main.transform.localEulerAngles = new Vector3(10, 0, 0);
 
-            //marker = GameObject.FindGameObjectWithTag("marker");
-            //MeshRenderer mr = marker.GetComponent<MeshRenderer>();
-            //mr.material = Resources.Load("marker_player") as Material;
+            marker = GameObject.FindGameObjectWithTag("marker");
+            MeshRenderer mr = marker.GetComponent<MeshRenderer>();
+            mr.material = Resources.Load("marker_player") as Material;
         }
         else
         {           

@@ -219,7 +219,7 @@ namespace TestPlugin
                 // insert account_id into active table list (to state that account has someone playing)
                 sql = "INSERT INTO active_users (account_id) VALUES ('" + accountID + "')";
                 cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
+                //cmd.ExecuteNonQuery();
             }
 
             CPlayer player = new CPlayer(message, accountID, playerName, new CVector3(player_x, player_y, player_z), new CVector3(pet_x, pet_y, pet_z), new CSound(master, bgm, sfx));
