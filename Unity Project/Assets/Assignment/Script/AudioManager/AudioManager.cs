@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Audio;
+using CustomPlugin;
 
 public class AudioManager : MonoBehaviour
 {
@@ -11,12 +12,13 @@ public class AudioManager : MonoBehaviour
 
     public AudioMixer mixer;
 
-    float[] volume = new float[3];
+    //float[] volume = new float[3];
+    CSound sound = new CSound();
 
-	// Use this for initialization
-	void Awake()
+    // Use this for initialization
+    void Awake()
     {
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
 
@@ -25,12 +27,12 @@ public class AudioManager : MonoBehaviour
             source[1].playOnAwake = false;
             source[1].loop = false;
 
-            for (int i = 0; i < volume.Length; ++i)
-                volume[i] = 0.0f;
+            //for (int i = 0; i < volume.Length; ++i)
+            //    volume[i] = 0.0f;
 
             DontDestroyOnLoad(gameObject);
         }
-        else if(instance != this)
+        else if (instance != this)
             Destroy(gameObject);
 
         instance.PlayBGM(0, 0);
@@ -39,30 +41,47 @@ public class AudioManager : MonoBehaviour
 
     public void SetMasterVolume(float vol)
     {
-        volume[0] = vol;
-        mixer.SetFloat("master", vol);
+        sound.Master = vol;
+        mixer.SetFloat("master", sound.Master);
     }
 
     public void SetBgmVolume(float vol)
     {
-        volume[1] = vol;
-        mixer.SetFloat("bgm", vol);
+        sound.Bgm = vol;
+        mixer.SetFloat("bgm", sound.Bgm);
     }
 
     public void SetSfxVolume(float vol)
     {
-        volume[2] = vol;
-        mixer.SetFloat("sfx", vol);
+        sound.Sfx = vol;
+        mixer.SetFloat("sfx", sound.Sfx);
+    }
+
+    public CSound GetVolume()
+    {
+        return sound;
     }
 
     public float GetVolume(int index)
     {
-        return volume[index];
+        float[] vol = new float[3];
+        vol[0] = sound.Master;
+        vol[1] = sound.Bgm;
+        vol[2] = sound.Sfx;
+
+        return vol[index];
+    }
+
+    public void SetVolume(CSound sound)
+    {
+        this.sound = sound;
     }
 
     public void SetVolume(float[] vol)
     {
-        volume = vol;
+        sound.Master = vol[0];
+        sound.Bgm = vol[1];
+        sound.Sfx = vol[2];
     }
 
     public void PlayBGM(int index, ulong timeDelay = 0)

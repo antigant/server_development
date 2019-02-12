@@ -131,8 +131,7 @@ public class LoginPage : Photon.PunBehaviour
             Player.GetInstance().SetPetPosition(pos);
 
             // audio volume
-            float[] volume = { System.Convert.ToSingle(message[9]), System.Convert.ToSingle(message[10]), System.Convert.ToSingle(message[11]) };
-            AudioManager.instance.SetVolume(volume);
+            AudioManager.instance.SetVolume(player.SoundSetting);
 
             // go over to viking scene
             UnityEngine.SceneManagement.SceneManager.LoadScene("VikingScene");
