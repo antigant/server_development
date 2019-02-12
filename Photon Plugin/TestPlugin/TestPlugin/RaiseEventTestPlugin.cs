@@ -43,6 +43,7 @@ namespace TestPlugin
             host.TryRegisterType(typeof(CRegistration), (byte)'F', CRegistration.Serialize, CRegistration.Deserialize);
             host.TryRegisterType(typeof(CLogout), (byte)'G', CLogout.Serialize, CLogout.Deserialize);
             host.TryRegisterType(typeof(CUpdateItem), (byte)'H', CUpdateItem.Serialize, CUpdateItem.Deserialize);
+            host.TryRegisterType(typeof(CAchievements), (byte)'I', CAchievements.Serialize, CAchievements.Deserialize);
 
             host.TryRegisterType(typeof(Test), (byte)'1', Test.Serialize, Test.Deserialize);
 
@@ -95,6 +96,11 @@ namespace TestPlugin
                         InitInventory(info);
                         break;
                     }
+                case (byte)EvCode.LEADERBOARD:
+                    {
+
+                        break;
+                    }
                 case (byte)EvCode.PHOTON_TEST:
                     {
                         Photon_Test(info);
@@ -116,13 +122,13 @@ namespace TestPlugin
             //};
             //Test test = new Test("wtf", "lol", testArray);
 
-            CPlayer player = new CPlayer("hello", 1, "a", new CVector3(), new CVector3(), new CSound());
+            //CPlayer player = new CPlayer("hello", 1, "a", new CVector3(), new CVector3(), new CSound());
 
-            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
-                senderActor: 0,
-                evCode: info.Request.EvCode,
-                data: new Dictionary<byte, object>() { { 245, player }, { 254, 0 } },
-                cacheOp: CacheOperations.DoNotCache);
+            //PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+            //    senderActor: 0,
+            //    evCode: info.Request.EvCode,
+            //    data: new Dictionary<byte, object>() { { 245, player }, { 254, 0 } },
+            //    cacheOp: CacheOperations.DoNotCache);
 
             //Test test = Test.Deserialize((byte[])info.Request.Data) as Test;
             //string sql = "INSERT INTO test (idtest) VALUES ('" + test.TestArray[0] + "')";
@@ -164,6 +170,7 @@ namespace TestPlugin
             float player_x = 0.0f, player_y = 0.0f, player_z = 0.0f;
             float pet_x = 0.0f, pet_y = 0.0f, pet_z = 0.0f;
             float master = 0.0f, bgm = 0.0f, sfx = 0.0f;
+            float timeOnline = 0.0f;
 
             EncryptPassword pw = new EncryptPassword();
             string digest = "";
@@ -189,6 +196,7 @@ namespace TestPlugin
                     player_x = rdr.GetFloat(2);
                     player_y = rdr.GetFloat(3);
                     player_z = rdr.GetFloat(4);
+                    timeOnline = rdr.GetFloat(5);
                 }
                 rdr.Close();
 
@@ -222,7 +230,7 @@ namespace TestPlugin
                 //cmd.ExecuteNonQuery();
             }
 
-            CPlayer player = new CPlayer(message, accountID, playerName, new CVector3(player_x, player_y, player_z), new CVector3(pet_x, pet_y, pet_z), new CSound(master, bgm, sfx));
+            CPlayer player = new CPlayer(message, accountID, playerName, timeOnline, new CVector3(player_x, player_y, player_z), new CVector3(pet_x, pet_y, pet_z), new CSound(master, bgm, sfx));
             //string returnMessage = "hello";
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
                                                   senderActor: 0,
@@ -271,7 +279,7 @@ namespace TestPlugin
                 rdr.Close();
 
                 // insert into player table
-                sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '" + registration.PlayerName + "', '51.09559', '3.4', '44.22058')";
+                sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z, time_online) VALUES ('" + accountID + "', '" + registration.PlayerName + "', '51.09559', '3.4', '44.22058', '0.0')";
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
 
@@ -301,7 +309,7 @@ namespace TestPlugin
 
             //// delete user from active list
             //string sql = "DELETE FROM active_users WHERE account_id='" + message[0] + "'";
-            string sql = "UPDATE player SET pos_x='" + logout.PlayerPosition.x + "', pos_y='" + logout.PlayerPosition.y + "', pos_z='" + logout.PlayerPosition.z + "' WHERE account_id ='" + logout.AccountID + "'";
+            string sql = "UPDATE player SET pos_x='" + logout.PlayerPosition.x + "', pos_y='" + logout.PlayerPosition.y + "', pos_z='" + logout.PlayerPosition.z + "', time_online='" + logout.TimeOnline  + "' WHERE account_id ='" + logout.AccountID + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             cmd.ExecuteNonQuery();
 
@@ -477,6 +485,82 @@ namespace TestPlugin
                                       data: new Dictionary<byte, object>() { { 245, false } },
                                       evCode: (byte)EvCode.ITEM_STATE,
                                       cacheOp: 0);
+        }
+
+        void Leaderboard(IRaiseEventCallInfo info)
+        {
+            // using this to store the top players 
+            string[] topPlayers = new string[3];
+
+            // getting the number of players in the db
+            string sql = "SELECT COUNT('account_id') FROM player";
+            MySqlCommand cmd = new MySqlCommand(sql, conn);
+            int count = Convert.ToInt32(cmd.ExecuteScalar().ToString());
+
+            float[][] score = new float[count][];
+
+            sql = "SELECT * FROM player";
+            cmd.CommandText = sql;
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            int i = 0;
+            while (rdr.Read())
+            {
+                float[] temp = new float[2]
+                {
+                                    rdr.GetInt32(0),
+                                    rdr.GetFloat(5),
+                };
+                score[i] = temp;
+                ++i;
+            }
+            rdr.Close();
+
+            float[] tempScore = new float[count];
+            for (int j = 0; j < count; ++j)
+                tempScore[j] = score[j][1];
+
+            // sort from small to big
+            Array.Sort(tempScore);
+
+            // making it decending (big to small)
+            Array.Reverse(tempScore);
+
+            float[] topScore = new float[3];
+            for (int j = 0; j < topScore.Length; ++j)
+                topScore[j] = tempScore[j];
+
+            int[] account_id = new int[3];
+            i = 0;
+            for (int y = 0; y < count; ++y)
+            {
+                for (int x = 0; x < topScore.Length; ++x)
+                {
+                    if (topScore[y] != score[x][1])
+                        continue;
+
+                    account_id[i] = (int)score[x][0];
+                    ++i;
+                    break;
+                }
+            }
+
+            for (i = 0; i < 3; ++i)
+            {
+                sql = "SELECT * FROM player WHERE account_id ='" + account_id[i] + "'";
+                cmd.CommandText = sql;
+                rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                    topPlayers[i] = rdr.GetString(1);
+                rdr.Close();
+            }
+
+            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+                                                  senderActor: 0,
+                                                  evCode: info.Request.EvCode,
+                                                  data: new Dictionary<byte, object>() { { 245, topPlayers }, { 254, 0 } },
+                                                  cacheOp: CacheOperations.DoNotCache);
         }
 
         // ----- Open connection to 

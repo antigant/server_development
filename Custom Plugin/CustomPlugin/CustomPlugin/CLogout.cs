@@ -7,13 +7,15 @@ namespace CustomPlugin
     public class CLogout
     {
         public int AccountID { get; }
+        public float TimeOnline { get; }
         public CVector3 PlayerPosition { get; }
         public CVector3 PetPosition { get; }
         public CSound Sound { get; }
 
-        public CLogout(int accountID, CVector3 playerPosition, CVector3 petPosition, CSound sound)
+        public CLogout(int accountID, float timeOnline, CVector3 playerPosition, CVector3 petPosition, CSound sound)
         {
             AccountID = accountID;
+            TimeOnline = timeOnline;
             PlayerPosition = playerPosition;
             PetPosition = petPosition;
             Sound = sound;
@@ -44,6 +46,7 @@ namespace CustomPlugin
                 using (var bw = new BinaryWriter(ms))
                 {
                     bw.Write(logout.AccountID);
+                    bw.Write(logout.TimeOnline);
 
                     byte[] bytes = CVector3.Serialize(logout.PlayerPosition);
                     bw.Write(bytes.LongLength);
@@ -64,7 +67,7 @@ namespace CustomPlugin
 
         public static object Deserialize(byte[] b)
         {
-            int accountID;
+            int accountID; float timeOnline;
             CVector3 player, pet;
             CSound sound;
             using (var ms = new MemoryStream(b))
@@ -72,6 +75,7 @@ namespace CustomPlugin
                 using (var br = new BinaryReader(ms))
                 {
                     accountID = br.ReadInt32();
+                    timeOnline = br.ReadSingle();
 
                     long size = br.ReadInt64();
                     player = CVector3.Deserialize(br.ReadBytes((int)size)) as CVector3;
@@ -83,7 +87,7 @@ namespace CustomPlugin
                     sound = CSound.Deserialize(br.ReadBytes((int)size)) as CSound;
                 }
             }
-            return new CLogout(accountID, player, pet, sound);
+            return new CLogout(accountID, timeOnline, player, pet, sound);
         }
     }
 }

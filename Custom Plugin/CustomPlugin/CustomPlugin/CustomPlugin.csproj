@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAchievements.cs" />
     <Compile Include="CLogout.cs" />
     <Compile Include="CRegistration.cs" />
     <Compile Include="CUpdateItem.cs" />

@@ -68,7 +68,7 @@ public class GameManagerVik : Photon.MonoBehaviour {
         byte evCode = (byte)EvCode.LOGOUT;
         CVector3 player = new CVector3(Player.GetInstance().GetPosition().x, Player.GetInstance().GetPosition().y, Player.GetInstance().GetPosition().z);
         CVector3 pet = new CVector3(Player.GetInstance().GetPetPosition().x, Player.GetInstance().GetPetPosition().y, Player.GetInstance().GetPetPosition().z);
-        CLogout logout = new CLogout(Player.GetInstance().GetAccountID(), player, pet, AudioManager.instance.GetVolume());
+        CLogout logout = new CLogout(Player.GetInstance().GetAccountID(), Player.GetInstance().GetTimeOnline(), player, pet, AudioManager.instance.GetVolume());
         bool reliable = true;
         PhotonNetwork.RaiseEvent(evCode, CLogout.Serialize(logout), reliable, null);
     }

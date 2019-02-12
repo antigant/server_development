@@ -89,6 +89,7 @@ public class ThirdPersonNetworkVik : Photon.MonoBehaviour
         {
             Player.GetInstance().SetPosition(transform.position);
             Player.GetInstance().SetForward(transform.forward);
+            Player.GetInstance().UpdateTime();
         }
     }
 

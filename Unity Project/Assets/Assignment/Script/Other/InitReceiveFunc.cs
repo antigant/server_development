@@ -11,6 +11,7 @@ public class InitReceiveFunc : MonoBehaviour
         PhotonNetwork.OnEventCall += ResetPasswordPage.ResetPasswordReceive;
         PhotonNetwork.OnEventCall += Inventory.UpdateItemReceive;
         PhotonNetwork.OnEventCall += Inventory.InitInventoryReceive;
+        PhotonNetwork.OnEventCall += Leaderboard.LeaderboardReceive;
 	}
 
     public static void RemoveEventCalls()
@@ -20,5 +21,6 @@ public class InitReceiveFunc : MonoBehaviour
         PhotonNetwork.OnEventCall -= ResetPasswordPage.ResetPasswordReceive;
         PhotonNetwork.OnEventCall -= Inventory.UpdateItemReceive;
         PhotonNetwork.OnEventCall -= Inventory.InitInventoryReceive;
+        PhotonNetwork.OnEventCall -= Leaderboard.LeaderboardReceive;
     }
 }

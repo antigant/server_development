@@ -8,15 +8,17 @@ namespace CustomPlugin
         public string ReturnMessage { get; private set; }
         public int AccountID { get; private set; }
         public string PlayerName { get; private set; }
+        public float TimeOnline { get; }
         public CVector3 PlayerPosition { get; private set; }
         public CVector3 PetPosition { get; private set; }
         public CSound SoundSetting { get; private set; }
 
-        public CPlayer(string returnMessage, int accountID, string playerName, CVector3 playerPosition, CVector3 petPosition, CSound soundSetting)
+        public CPlayer(string returnMessage, int accountID, string playerName, float timeOnline, CVector3 playerPosition, CVector3 petPosition, CSound soundSetting)
         {
             ReturnMessage = returnMessage;
             AccountID = accountID;
             PlayerName = playerName;
+            TimeOnline = timeOnline;
             PlayerPosition = playerPosition;
             PetPosition = petPosition;
             SoundSetting = soundSetting;
@@ -34,6 +36,7 @@ namespace CustomPlugin
                     bw.Write(player.ReturnMessage);
                     bw.Write(player.AccountID);
                     bw.Write(player.PlayerName);
+                    bw.Write(player.TimeOnline);
 
                     // get the number of byte array written into the stream
                     byte[] bytes = CVector3.Serialize(player.PlayerPosition);
@@ -55,6 +58,7 @@ namespace CustomPlugin
 
         public static object Deserialize(byte[] b)
         {
+            float timeOnline;
             string message, playerName;
             int accountID;
             CVector3 playerPos, petPos;
@@ -66,6 +70,7 @@ namespace CustomPlugin
                     message = br.ReadString();
                     accountID = br.ReadInt32();
                     playerName = br.ReadString();
+                    timeOnline = br.ReadSingle();
 
                     long size = br.ReadInt64();
                     playerPos = CVector3.Deserialize(br.ReadBytes((int)size)) as CVector3;
@@ -77,7 +82,7 @@ namespace CustomPlugin
                     sound = CSound.Deserialize(br.ReadBytes((int)size)) as CSound;
                 }
             }
-            return new CPlayer(message, accountID, playerName, playerPos, petPos, sound);
+            return new CPlayer(message, accountID, playerName, timeOnline, playerPos, petPos, sound);
         }
     }
 }

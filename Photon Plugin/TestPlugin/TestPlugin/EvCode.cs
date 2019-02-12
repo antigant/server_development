@@ -10,6 +10,9 @@
         INIT_INVENTORY,
         ITEM_STATE, // Using this to receive message from plugin to turn off the active state
 
+        LEADERBOARD,
+        ACHIEVEMENT,
+
         PHOTON_TEST,
     }
 }

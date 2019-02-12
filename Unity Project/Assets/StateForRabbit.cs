@@ -39,7 +39,8 @@ public class StateForRabbit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+        if(Player == null)
+            Player = GameObject.FindGameObjectWithTag("Player");
 
         //Vector3 extraGravityForce = (Physics.gravity * 2) - Physics.gravity;
         //GetComponent<Rigidbody>().AddForce(extraGravityForce);

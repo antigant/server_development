@@ -23,6 +23,9 @@ public class Player
     // inventory
     Inventory inventory;
 
+    // Achievements/Leaderboard
+    float timeOnline;
+
     // Protect another object from being instantiate
     private Player(int id, string name)
     {
@@ -191,5 +194,20 @@ public class Player
             return;
 
         inventory.InventoryLook();
+    }
+
+    public void SetTime(float time)
+    {
+        timeOnline = time;
+    }
+
+    public void UpdateTime()
+    {
+        timeOnline += Time.deltaTime;
+    }
+
+    public float GetTimeOnline()
+    {
+        return timeOnline;
     }
 }
