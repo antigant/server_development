@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using CustomPlugin;
 
 public class GameManagerVik : Photon.MonoBehaviour {
 
@@ -65,10 +66,11 @@ public class GameManagerVik : Photon.MonoBehaviour {
     void LogoutEvent()
     {
         byte evCode = (byte)EvCode.LOGOUT;
-        // logout to save player and pet position
-        string[] content = { Player.GetInstance().GetAccountID().ToString(), Player.GetInstance().GetPosition().x.ToString(), Player.GetInstance().GetPosition().y.ToString(), Player.GetInstance().GetPosition().z.ToString(), Player.GetInstance().GetPetPosition().x.ToString(), Player.GetInstance().GetPetPosition().y.ToString(), Player.GetInstance().GetPetPosition().z.ToString(), AudioManager.instance.GetVolume(0).ToString(), AudioManager.instance.GetVolume(1).ToString(), AudioManager.instance.GetVolume(2).ToString() };
+        CVector3 player = new CVector3(Player.GetInstance().GetPosition().x, Player.GetInstance().GetPosition().y, Player.GetInstance().GetPosition().z);
+        CVector3 pet = new CVector3(Player.GetInstance().GetPetPosition().x, Player.GetInstance().GetPetPosition().y, Player.GetInstance().GetPetPosition().z);
+        CLogout logout = new CLogout(Player.GetInstance().GetAccountID(), player, pet, AudioManager.instance.GetVolume());
         bool reliable = true;
-        PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+        PhotonNetwork.RaiseEvent(evCode, CLogout.Serialize(logout), reliable, null);
     }
 
     private void OnApplicationQuit()

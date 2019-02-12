@@ -4,18 +4,24 @@ using CustomPlugin;
 public class ReceiveArray : Photon.PunBehaviour
 {
     //int[] testArray = { 0, 0 };
-    //Item[] testItem = new Item[2]
-    //{
-    //    new Item(0, "nothing"),
-    //    new Item(1, "boo"),
-    //};
+    Test testItem;
 
     void Awake()
     {
+        int[] testArray = new int[4]
+            { 100,2123,1235,1235432 };
+        testItem = new Test("hello", "hello", testArray);
+
         //if (!PhotonNetwork.connected)
+        //{
         //    PhotonNetwork.ConnectUsingSettings("v1.0");
 
-        //PhotonNetwork.OnEventCall += TestReceive;
+        //    RoomOptions options = new RoomOptions();
+        //    options.MaxPlayers = 0;
+        //    PhotonNetwork.JoinOrCreateRoom("InitServer", options, TypedLobby.Default);
+        //}
+
+        PhotonNetwork.OnEventCall += TestReceive;
     }
 
     private void Update()
@@ -25,49 +31,48 @@ public class ReceiveArray : Photon.PunBehaviour
             return;
     }
 
-    //void OnGUI()
-    //{
-    //    if (!PhotonNetwork.connected)
-    //    {
-    //        ShowConnectingGUI();
-    //        return;   //Wait for a connection
-    //    }
+    void OnGUI()
+    {
+        if (!PhotonNetwork.connected)
+        {
+            ShowConnectingGUI();
+            return;   //Wait for a connection
+        }
 
-    //    //if (PhotonNetwork.room == null) return; //Only display this GUI when inside a room
+        if (PhotonNetwork.room == null) return; //Only display this GUI when inside a room
 
-    //    //if (GUILayout.Button("Test receive array"))
-    //    //{
-    //    //    Test();
-    //    //}
-    //    if (GUILayout.Button("Test custom class"))
-    //    {
-    //        Test();
-    //    }
+        //if (GUILayout.Button("Test receive array"))
+        //{
+        //    Test();
+        //}
+        if (GUILayout.Button("Test custom class"))
+        {
+            TestFunction();
+        }
 
-    //    //GUILayout.Label(string.Format("Element in array {0}, {1}", testArray[0], testArray[1]));
-    //    GUILayout.Label(string.Format("First Item ID: {0}, Item Name: {1}", testItem[0].ItemID, testItem[0].Name));
-    //    GUILayout.Label(string.Format("Second Item ID: {0}, Item Name: {1}", testItem[1].ItemID, testItem[1].Name));
-    //}
+        //GUILayout.Label(string.Format("Element in array {0}, {1}", testArray[0], testArray[1]));
+        GUILayout.Label(string.Format("First Item ID: {0}, Item Name: {1}, testArray: {2}", testItem.ItemID, testItem.Name, testItem.TestArray[0]));
+    }
 
-    //public void Test()
-    //{
-    //    byte evCode = (byte)EvCode.PHOTON_TEST;
-    //    bool reliable = true;
-    //    PhotonNetwork.RaiseEvent(evCode, null, reliable, null);
+    public void TestFunction()
+    {
+        byte evCode = (byte)EvCode.PHOTON_TEST;
+        bool reliable = true;
+        PhotonNetwork.RaiseEvent(evCode, Test.Serialize(testItem), reliable, null);
 
-    //    Debug.Log("Still works");
-    //}
+        Debug.Log("Still works");
+    }
 
-    //void TestReceive(byte eventCode, object content, int senderID)
-    //{
-    //    if (eventCode != (byte)EvCode.LOGOUT)
-    //        return;
+    void TestReceive(byte eventCode, object content, int senderID)
+    {
+        if (eventCode == (byte)EvCode.PHOTON_TEST)
+        {
+            //testItem = Test.Deserialize((byte[])content) as Test;
+            CPlayer player = CPlayer.Deserialize((byte[])content) as CPlayer;
 
-    //    General.Message = (string)content;
-
-    //    //testArray = (int[])content;
-    //    //testItem = Item.Deserialize((byte[])content) as Item[];
-    //}
+            Debug.Log(player.AccountID);
+        }
+    }
 
     void ShowConnectingGUI()
     {

@@ -36,7 +36,7 @@ public class InitRoom : MonoBehaviour
 
         // wait 2 seconds before joining or creating room
         dt += Time.deltaTime;
-        if (dt < 1.25f)
+        if (dt < 1.75f)
             return;
 
         LoginPage();
@@ -54,7 +54,7 @@ public class InitRoom : MonoBehaviour
 
         // Join or create room to be able to communicate with the server plugin, not sure what will happen if i remove the booleanforchecking  if player is in room.
         PhotonNetwork.JoinOrCreateRoom("InitServer", options, TypedLobby.Default);
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Login");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Login"); //Login TestArray
     }
 
     void ShowConnectingGUI()

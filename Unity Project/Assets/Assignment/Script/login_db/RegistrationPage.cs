@@ -103,7 +103,11 @@ public class RegistrationPage : Photon.PunBehaviour
     void Registration()
     {
         byte evCode = (byte)EvCode.REGISTRATION;
-        string[] content = { username.ToLower(), password, playerName };
+        //string[] content = { username.ToLower(), password, playerName };
+        EncryptPassword pw = new EncryptPassword();
+        HashWithSaltResult hash = pw.HashWithSalt(password, 64, System.Security.Cryptography.SHA256.Create());
+
+        CRegistration registration = new CRegistration(username.ToLower(), playerName, hash);
         bool reliable = true;
 
         bool ready = false;
@@ -131,7 +135,7 @@ public class RegistrationPage : Photon.PunBehaviour
 
         // send over to the server plugin to register if password matches and every textfield is filled
         if (ready)
-            PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+            PhotonNetwork.RaiseEvent(evCode, CRegistration.Serialize(registration), reliable, null);
     }
 
     public static void RegistrationReceive(byte eventCode, object content, int senderID)

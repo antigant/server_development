@@ -9,7 +9,7 @@ namespace TestPlugin
 {
     public class RaiseEventTestPlugin : PluginBase
     {
-        readonly string connStr = "server=localhost;user=root;database=photon;port=3306;password=qwerty";
+        readonly string connStr = "server=35.225.27.6;user=root;database=photon;port=3306;password=KptCb5eGpM3Cs3zm";
         MySqlConnection conn;
 
         public string ServerString { get; private set; }
@@ -36,6 +36,16 @@ namespace TestPlugin
         public override bool SetupInstance(IPluginHost host, Dictionary<string, string> config, out string errorMsg)
         {
             host.TryRegisterType(typeof(Item), (byte)'A', Item.Serialize, Item.Deserialize);
+            host.TryRegisterType(typeof(CLogin), (byte)'B', CLogin.Serialize, CLogin.Deserialize);
+            host.TryRegisterType(typeof(CSound), (byte)'C', CSound.Serialize, CSound.Deserialize);
+            host.TryRegisterType(typeof(CPlayer), (byte)'D', CPlayer.Serialize, CPlayer.Deserialize);
+            host.TryRegisterType(typeof(CVector3), (byte)'E', CVector3.Serialize, CVector3.Deserialize);
+            host.TryRegisterType(typeof(CRegistration), (byte)'F', CRegistration.Serialize, CRegistration.Deserialize);
+            host.TryRegisterType(typeof(CLogout), (byte)'G', CLogout.Serialize, CLogout.Deserialize);
+
+
+            host.TryRegisterType(typeof(Test), (byte)'1', Test.Serialize, Test.Deserialize);
+
             return base.SetupInstance(host, config, out errorMsg);
         }
 
@@ -85,48 +95,58 @@ namespace TestPlugin
                         InitInventory(info);
                         break;
                     }
+                case (byte)EvCode.PHOTON_TEST:
+                    {
+                        Photon_Test(info);
+                        break;
+                    }
                 default:
-                    break;
+                        break;
             }
 
             DisconnectFromMySQL();
         }
 
-        //void Photon_Test(IRaiseEventCallInfo info)
-        //{
-        //    //int[] test = { 100, 11238 };
-        //    Item[] test = new Item[2]
-        //    {
-        //        new Item(541, "hello"),
-        //        new Item(123, "byee"),
-        //    };
+        void Photon_Test(IRaiseEventCallInfo info)
+        {
+            //int[] test = { 100, 11238 };
+            //int[] testArray = new int[3]
+            //{
+            //    1,2,3
+            //};
+            //Test test = new Test("wtf", "lol", testArray);
 
-        //    PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } }, 
-        //        senderActor: 0,
-        //        evCode:info.Request.EvCode, 
-        //        data: new Dictionary<byte, object>() { { 245, test }, { 254, 0 } }, 
-        //        cacheOp: CacheOperations.DoNotCache);
-        //}
+            CPlayer player = new CPlayer("hello", 1, "a", new CVector3(), new CVector3(), new CSound());
+
+            PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+                senderActor: 0,
+                evCode: info.Request.EvCode,
+                data: new Dictionary<byte, object>() { { 245, player }, { 254, 0 } },
+                cacheOp: CacheOperations.DoNotCache);
+
+            //Test test = Test.Deserialize((byte[])info.Request.Data) as Test;
+            //string sql = "INSERT INTO test (idtest) VALUES ('" + test.TestArray[0] + "')";
+            //MySqlCommand cmd = new MySqlCommand(sql, conn);
+            //cmd.ExecuteNonQuery();
+        }
 
         void Login(IRaiseEventCallInfo info)
         {
             // check if both username and password is right
-            string[] message = (string[])info.Request.Data;
-
-            string recvUsername = message[0];
-            string recvPassword = message[1];
+            CLogin detail = CLogin.Deserialize((byte[])info.Request.Data) as CLogin;
 
             // Check if username is in database
-            string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
+            string sql = "SELECT * FROM account WHERE username = '" + detail.Username + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
-            int accountID = 0; string username = null; string password = null;
+            int accountID = 0; string username = null; string password = null; string salt = null;
             while (rdr.Read())
             {
                 accountID = rdr.GetInt32(0);
                 username = rdr.GetString(1);
                 password = rdr.GetString(2);
+                salt = rdr.GetString(3);
             }
             rdr.Close();
 
@@ -139,40 +159,36 @@ namespace TestPlugin
                 accActive = true;
             rdr.Close();
 
-            string[] returnMessage = new string[12]
-            {
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-                "NULL",
-            };
-            if (username == null || password != recvPassword)
-                returnMessage[0] = "Unsuccessful, Message=Incorrect username/password";
+            // Init the player
+            string message = "", playerName = "";
+            float player_x = 0.0f, player_y = 0.0f, player_z = 0.0f;
+            float pet_x = 0.0f, pet_y = 0.0f, pet_z = 0.0f;
+            float master = 0.0f, bgm = 0.0f, sfx = 0.0f;
+
+            EncryptPassword pw = new EncryptPassword();
+            string digest = "";
+            if (salt != null)
+                digest = pw.GetDigest(detail.Password, salt, System.Security.Cryptography.SHA256.Create());
+
+            if (username == null || digest != password)
+                message = "Unsuccessful, Message=Incorrect username/password";
             else if (accActive)
-                returnMessage[0] = "Unsuccessful, Message=Account is currently active";
+                message = "Unsuccessful, Message=Account is currently active";
             else
             {
+                message = "Successful";
+
                 // get player name & position
                 sql = "SELECT * FROM player WHERE account_id ='" + accountID + "'";
                 cmd.CommandText = sql;
                 rdr = cmd.ExecuteReader();
-                returnMessage[0] = "Successful";
-                returnMessage[1] = accountID.ToString();
 
                 while (rdr.Read())
                 {
-                    returnMessage[2] = rdr.GetString(1);
-                    returnMessage[3] = rdr.GetFloat(2).ToString();
-                    returnMessage[4] = rdr.GetFloat(3).ToString();
-                    returnMessage[5] = rdr.GetFloat(4).ToString();
+                    playerName = rdr.GetString(1);
+                    player_x = rdr.GetFloat(2);
+                    player_y = rdr.GetFloat(3);
+                    player_z = rdr.GetFloat(4);
                 }
                 rdr.Close();
 
@@ -181,10 +197,10 @@ namespace TestPlugin
                 cmd.CommandText = sql;
                 rdr = cmd.ExecuteReader();
                 while (rdr.Read())
-                { 
-                    returnMessage[6] = rdr.GetFloat(1).ToString();
-                    returnMessage[7] = rdr.GetFloat(2).ToString();
-                    returnMessage[8] = rdr.GetFloat(3).ToString();
+                {
+                    pet_x = rdr.GetFloat(1);
+                    pet_y = rdr.GetFloat(2);
+                    pet_z = rdr.GetFloat(3);
                 }
                 rdr.Close();
 
@@ -194,9 +210,9 @@ namespace TestPlugin
                 rdr = cmd.ExecuteReader();
                 while (rdr.Read())
                 {
-                    returnMessage[9] = rdr.GetFloat(1).ToString();
-                    returnMessage[10] = rdr.GetFloat(2).ToString();
-                    returnMessage[11] = rdr.GetFloat(3).ToString();
+                    master = rdr.GetFloat(1);
+                    bgm = rdr.GetFloat(2);
+                    sfx = rdr.GetFloat(3);
                 }
                 rdr.Close();
 
@@ -206,23 +222,21 @@ namespace TestPlugin
                 cmd.ExecuteNonQuery();
             }
 
+            CPlayer player = new CPlayer(message, accountID, playerName, new CVector3(player_x, player_y, player_z), new CVector3(pet_x, pet_y, pet_z), new CSound(master, bgm, sfx));
+            //string returnMessage = "hello";
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
-                                      senderActor: 0,
-                                      evCode: info.Request.EvCode,
-                                      data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
-                                      cacheOp: CacheOperations.DoNotCache);
+                                                  senderActor: 0,
+                                                  evCode: info.Request.EvCode,
+                                                  data: new Dictionary<byte, object>() { { 245, player }, { 254, 0 } },
+                                                  cacheOp: CacheOperations.DoNotCache);
         }
 
         void Registration(IRaiseEventCallInfo info)
         {
-            string[] message = (string[])info.Request.Data;
-
-            string recvUsername = message[0];
-            string recvPassword = message[1];
-            string recvPlayerName = message[2];
+            CRegistration registration = CRegistration.Deserialize((byte[])info.Request.Data) as CRegistration;
 
             // Check if username is in database
-            string sql = "SELECT * FROM account WHERE username ='" + recvUsername + "'";
+            string sql = "SELECT * FROM account WHERE username ='" + registration.Username + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -232,7 +246,7 @@ namespace TestPlugin
                 returnMessage = "Unsuccessful, Message=Username exists already";
             rdr.Close();
 
-            sql = "SELECT * FROM player WHERE player_name ='" + recvPlayerName + "'";
+            sql = "SELECT * FROM player WHERE player_name ='" + registration.PlayerName + "'";
             cmd.CommandText = sql;
             rdr = cmd.ExecuteReader();
             if (rdr.HasRows)
@@ -243,12 +257,12 @@ namespace TestPlugin
             if (returnMessage == "")
             {
                 // insert into database
-                sql = "INSERT INTO account (username, password, date_created) VALUES ('" + recvUsername + "', '" + recvPassword + "', now())";
+                sql = "INSERT INTO account (username, password, salt, date_created) VALUES ('" + registration.Username + "', '" + registration.Hash.Digest + "', '" + registration.Hash.Salt + "', now())";
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
 
                 // get account_id from account
-                sql = "SELECT * FROM account WHERE username ='" + recvUsername + "'";
+                sql = "SELECT * FROM account WHERE username ='" + registration.Username + "'";
                 cmd.CommandText = sql;
                 rdr = cmd.ExecuteReader();
                 int accountID = 0;
@@ -257,7 +271,7 @@ namespace TestPlugin
                 rdr.Close();
 
                 // insert into player table
-                sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '" + recvPlayerName + "', '51.09559', '3.4', '44.22058')";
+                sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '" + registration.PlayerName + "', '51.09559', '3.4', '44.22058')";
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
 
@@ -283,23 +297,23 @@ namespace TestPlugin
 
         void Logout(IRaiseEventCallInfo info)
         {
-            string[] message = (string[])info.Request.Data;
+            CLogout logout = CLogout.Deserialize((byte[])info.Request.Data) as CLogout;
 
             //// delete user from active list
             //string sql = "DELETE FROM active_users WHERE account_id='" + message[0] + "'";
-            string sql = "UPDATE player SET pos_x='" + message[1] + "', pos_y='" + message[2] + "', pos_z='" + message[3] + "' WHERE account_id ='" + message[0] + "'";
+            string sql = "UPDATE player SET pos_x='" + logout.PlayerPosition.x + "', pos_y='" + logout.PlayerPosition.y + "', pos_z='" + logout.PlayerPosition.z + "' WHERE account_id ='" + logout.AccountID + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             cmd.ExecuteNonQuery();
 
-            sql = "UPDATE pet SET pos_x='" + message[4] + "', pos_y='" + message[5] + "', pos_z='" + message[6] + "' WHERE account_id ='" + message[0] + "'";
+            sql = "UPDATE pet SET pos_x='" + logout.PetPosition.x + "', pos_y='" + logout.PetPosition.y + "', pos_z='" + logout.PetPosition.z + "' WHERE account_id ='" + logout.AccountID + "'";
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
-            sql = "UPDATE sound SET master='" + message[7] + "', bgm='" + message[8] + "', sfx='" + message[9] + "' WHERE account_id ='" + message[0] + "'";
+            sql = "UPDATE sound SET master='" + logout.Sound.Master + "', bgm='" + logout.Sound.Bgm + "', sfx='" + logout.Sound.Sfx + "' WHERE account_id ='" + logout.AccountID + "'";
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
-            sql = "DELETE FROM active_users WHERE account_id = '" + message[0] + "'";
+            sql = "DELETE FROM active_users WHERE account_id = '" + logout.AccountID + "'";
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
         }
@@ -525,3 +539,256 @@ namespace TestPlugin
 
 //    return message.Substring(pFrom, pTo - pFrom);
 //}
+
+//void Login(IRaiseEventCallInfo info)
+//{
+//    // check if both username and password is right
+//    string[] message = (string[])info.Request.Data;
+
+//    string recvUsername = message[0];
+//    string recvPassword = message[1];
+
+//    // Check if username is in database
+//    string sql = "SELECT * FROM account WHERE username = '" + recvUsername + "'";
+//    MySqlCommand cmd = new MySqlCommand(sql, conn);
+//    MySqlDataReader rdr = cmd.ExecuteReader();
+
+//    int accountID = 0; string username = null; string password = null;
+//    while (rdr.Read())
+//    {
+//        accountID = rdr.GetInt32(0);
+//        username = rdr.GetString(1);
+//        password = rdr.GetString(2);
+//    }
+//    rdr.Close();
+
+//    // check if the account is currently active
+//    bool accActive = false;
+//    sql = "SELECT * FROM active_users WHERE account_id ='" + accountID + "'";
+//    cmd.CommandText = sql;
+//    rdr = cmd.ExecuteReader();
+//    if (rdr.HasRows)
+//        accActive = true;
+//    rdr.Close();
+
+//    string[] returnMessage = new string[12]
+//    {
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//        "NULL",
+//    };
+//    if (username == null || password != recvPassword)
+//        returnMessage[0] = "Unsuccessful, Message=Incorrect username/password";
+//    else if (accActive)
+//        returnMessage[0] = "Unsuccessful, Message=Account is currently active";
+//    else
+//    {
+//        // get player name & position
+//        sql = "SELECT * FROM player WHERE account_id ='" + accountID + "'";
+//        cmd.CommandText = sql;
+//        rdr = cmd.ExecuteReader();
+//        returnMessage[0] = "Successful";
+//        returnMessage[1] = accountID.ToString();
+
+//        while (rdr.Read())
+//        {
+//            returnMessage[2] = rdr.GetString(1);
+//            returnMessage[3] = rdr.GetFloat(2).ToString();
+//            returnMessage[4] = rdr.GetFloat(3).ToString();
+//            returnMessage[5] = rdr.GetFloat(4).ToString();
+//        }
+//        rdr.Close();
+
+//        // get pet's position
+//        sql = "SELECT * FROM pet WHERE account_id ='" + accountID + "'";
+//        cmd.CommandText = sql;
+//        rdr = cmd.ExecuteReader();
+//        while (rdr.Read())
+//        { 
+//            returnMessage[6] = rdr.GetFloat(1).ToString();
+//            returnMessage[7] = rdr.GetFloat(2).ToString();
+//            returnMessage[8] = rdr.GetFloat(3).ToString();
+//        }
+//        rdr.Close();
+
+//        // get the audio settings
+//        sql = "SELECT * FROM sound WHERE account_id='" + accountID + "'";
+//        cmd.CommandText = sql;
+//        rdr = cmd.ExecuteReader();
+//        while (rdr.Read())
+//        {
+//            returnMessage[9] = rdr.GetFloat(1).ToString();
+//            returnMessage[10] = rdr.GetFloat(2).ToString();
+//            returnMessage[11] = rdr.GetFloat(3).ToString();
+//        }
+//        rdr.Close();
+
+//        // insert account_id into active table list (to state that account has someone playing)
+//        sql = "INSERT INTO active_users (account_id) VALUES ('" + accountID + "')";
+//        cmd.CommandText = sql;
+//        cmd.ExecuteNonQuery();
+//    }
+
+//    PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+//                              senderActor: 0,
+//                              evCode: info.Request.EvCode,
+//                              data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+//                              cacheOp: CacheOperations.DoNotCache);
+//}
+
+//void Registration(IRaiseEventCallInfo info)
+//{
+//    string[] message = (string[])info.Request.Data;
+
+//    string recvUsername = message[0];
+//    string recvPassword = message[1];
+//    string recvPlayerName = message[2];
+
+//    // Check if username is in database
+//    string sql = "SELECT * FROM account WHERE username ='" + recvUsername + "'";
+//    MySqlCommand cmd = new MySqlCommand(sql, conn);
+//    MySqlDataReader rdr = cmd.ExecuteReader();
+
+//    string returnMessage = "";
+
+//    if (rdr.HasRows)
+//        returnMessage = "Unsuccessful, Message=Username exists already";
+//    rdr.Close();
+
+//    sql = "SELECT * FROM player WHERE player_name ='" + recvPlayerName + "'";
+//    cmd.CommandText = sql;
+//    rdr = cmd.ExecuteReader();
+//    if (rdr.HasRows)
+//        returnMessage = "Unsuccessful, Message=Character Name exist already";
+//    rdr.Close();
+
+//    // There's no error, thus registration is successful!
+//    if (returnMessage == "")
+//    {
+//        // insert into database
+//        sql = "INSERT INTO account (username, password, date_created) VALUES ('" + recvUsername + "', '" + recvPassword + "', now())";
+//        cmd.CommandText = sql;
+//        cmd.ExecuteNonQuery();
+
+//        // get account_id from account
+//        sql = "SELECT * FROM account WHERE username ='" + recvUsername + "'";
+//        cmd.CommandText = sql;
+//        rdr = cmd.ExecuteReader();
+//        int accountID = 0;
+//        while (rdr.Read())
+//            accountID = rdr.GetInt32(0);
+//        rdr.Close();
+
+//        // insert into player table
+//        sql = "INSERT INTO player (account_id, player_name, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '" + recvPlayerName + "', '51.09559', '3.4', '44.22058')";
+//        cmd.CommandText = sql;
+//        cmd.ExecuteNonQuery();
+
+//        // insert into pet table
+//        sql = "INSERT INTO pet (account_id, pos_x, pos_y, pos_z) VALUES ('" + accountID + "', '51.0956', '2.3454', '43.52058')";
+//        cmd.CommandText = sql;
+//        cmd.ExecuteNonQuery();
+
+//        sql = "INSERT INTO sound (account_id, master, bgm, sfx) VALUES ('" + accountID + "', '0.0', '0.0', '0.0')";
+//        cmd.CommandText = sql;
+//        cmd.ExecuteNonQuery();
+
+//        returnMessage = "Successful, Message=Registration Complete!";
+//    }
+
+//    // returns the message to the client
+//    PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+//                              senderActor: 0,
+//                              evCode: info.Request.EvCode,
+//                              data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+//                              cacheOp: CacheOperations.DoNotCache);
+//}
+
+
+
+//// check if the account is currently active
+//bool accActive = false;
+//sql = "SELECT * FROM active_users WHERE account_id ='" + accountID + "'";
+//            cmd.CommandText = sql;
+//            rdr = cmd.ExecuteReader();
+//            if (rdr.HasRows)
+//                accActive = true;
+//rdr.Close();
+
+//            // Init the player
+//            string message = "", playerName = "";
+//float player_x = 0.0f, player_y = 0.0f, player_z = 0.0f;
+//float pet_x = 0.0f, pet_y = 0.0f, pet_z = 0.0f;
+//float master = 0.0f, bgm = 0.0f, sfx = 0.0f;
+
+//EncryptPassword pw = new EncryptPassword();
+//string digest = pw.GetDigest(detail.Password, salt, System.Security.Cryptography.SHA256.Create());
+
+//            if (username == null || digest != password)
+//                message = "Unsuccessful, Message=Incorrect username/password";
+//            else if (accActive)
+//                message = "Unsuccessful, Message=Account is currently active";
+//            else
+//            {
+//                message = "Successful";
+
+//                // get player name & position
+//                sql = "SELECT * FROM player WHERE account_id ='" + accountID + "'";
+//                cmd.CommandText = sql;
+//                rdr = cmd.ExecuteReader();
+
+//                while (rdr.Read())
+//                {
+//                    playerName = rdr.GetString(1);
+//                    player_x = rdr.GetFloat(2);
+//                    player_y = rdr.GetFloat(3);
+//                    player_z = rdr.GetFloat(4);
+//                }
+//                rdr.Close();
+
+//                // get pet's position
+//                sql = "SELECT * FROM pet WHERE account_id ='" + accountID + "'";
+//                cmd.CommandText = sql;
+//                rdr = cmd.ExecuteReader();
+//                while (rdr.Read())
+//                {
+//                    pet_x = rdr.GetFloat(1);
+//                    pet_y = rdr.GetFloat(2);
+//                    pet_z = rdr.GetFloat(3);
+//                }
+//                rdr.Close();
+
+//                // get the audio settings
+//                sql = "SELECT * FROM sound WHERE account_id='" + accountID + "'";
+//                cmd.CommandText = sql;
+//                rdr = cmd.ExecuteReader();
+//                while (rdr.Read())
+//                {
+//                    master = rdr.GetFloat(1);
+//                    bgm = rdr.GetFloat(2);
+//                    sfx = rdr.GetFloat(3);
+//                }
+//                rdr.Close();
+
+//                // insert account_id into active table list (to state that account has someone playing)
+//                sql = "INSERT INTO active_users (account_id) VALUES ('" + accountID + "')";
+//                cmd.CommandText = sql;
+//                cmd.ExecuteNonQuery();
+//            }
+
+//            CPlayer player = new CPlayer(message, accountID, playerName, new CVector3(player_x, player_y, player_z), new CVector3(pet_x, pet_y, pet_z), new CSound(master, bgm, sfx));
+////string returnMessage = "hello";
+//PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+//                                      senderActor: 0,
+//                                      evCode: info.Request.EvCode,
+//                                      data: new Dictionary<byte, object>() { { 245, player }, { 254, 0 } },
+//                                      cacheOp: CacheOperations.DoNotCache);

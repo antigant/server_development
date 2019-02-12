@@ -94,55 +94,55 @@ public class LoginPage : Photon.PunBehaviour
     void Login()
     {
         byte evCode = (byte)EvCode.LOGIN;
-        string[] content = { username.ToLower(), password };
+        CLogin detail = new CLogin(username.ToLower(), password);
         bool reliable = true;
-        PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+        PhotonNetwork.RaiseEvent(evCode, CLogin.Serialize(detail), reliable, null);
     }
 
     // Use this to receive message from server
     public static void LoginReceive(byte eventCode, object content, int senderID)
     {
-        if (eventCode != (byte)EvCode.LOGIN || senderID > 0)
-            return;
-
-        string[] message = (string[])content;
-        // Successful
-        if (message[0][0] == 'S')
+        if (eventCode == (byte)EvCode.LOGIN)
         {
-            // set up relevant data for the player
-            int accountID = System.Convert.ToInt32(message[1]);
-            string playerName = message[2];
-            // Init the player
-            Player.GetInstance(accountID, playerName, force: true);
+            var player = CPlayer.Deserialize((byte[])content) as CPlayer;
+            // Successful
+            if (player.ReturnMessage[0] == 'S')
+            {
+                // set up relevant data for the player
+                int accountID = player.AccountID;
+                string playerName = player.PlayerName;
+                // Init the player
+                Player.GetInstance(accountID, playerName, force: true);
 
-            // player position
-            float pos_x = System.Convert.ToSingle(message[3]);
-            float pos_y = System.Convert.ToSingle(message[4]);
-            float pos_z = System.Convert.ToSingle(message[5]);
-            Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
-            Player.GetInstance().SetPosition(pos);
+                // player position
+                float pos_x = player.PlayerPosition.x;
+                float pos_y = player.PlayerPosition.y;
+                float pos_z = player.PlayerPosition.z;
+                Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
+                Player.GetInstance().SetPosition(pos);
 
-            // pet position
-            pos_x = System.Convert.ToSingle(message[6]);
-            pos_y = System.Convert.ToSingle(message[7]);
-            pos_z = System.Convert.ToSingle(message[8]);
-            pos = new Vector3(pos_x, pos_y, pos_z);
-            Player.GetInstance().SetPetPosition(pos);
+                // pet position
+                pos_x = player.PetPosition.x;
+                pos_y = player.PetPosition.y;
+                pos_z = player.PetPosition.z;
+                pos = new Vector3(pos_x, pos_y, pos_z);
+                Player.GetInstance().SetPetPosition(pos);
 
-            // audio volume
-            float[] volume = { System.Convert.ToSingle(message[9]), System.Convert.ToSingle(message[10]), System.Convert.ToSingle(message[11]) };
-            AudioManager.instance.SetVolume(volume);
+                // audio volume
+                float[] volume = { player.SoundSetting.Master, player.SoundSetting.Bgm, player.SoundSetting.Sfx };
+                AudioManager.instance.SetVolume(volume);
 
-            // go over to viking scene
-            UnityEngine.SceneManagement.SceneManager.LoadScene("VikingScene");
-            General.Message = "";
-            PhotonNetwork.LeaveRoom();
-        }
-        // Unsuccesful
-        else if(message[0][0] == 'U')
-        {
-            // inform the player that the username/password is incorrect
-            General.Message = General.GetStringDataFromMessage(message[0], "Message");
+                // go over to viking scene
+                UnityEngine.SceneManagement.SceneManager.LoadScene("VikingScene");
+                General.Message = "";
+                PhotonNetwork.LeaveRoom();
+            }
+            // Unsuccesful
+            else if (player.ReturnMessage[0] == 'U')
+            {
+                // inform the player that the username/password is incorrect
+                General.Message = General.GetStringDataFromMessage(player.ReturnMessage, "Message");
+            }
         }
     }
 
