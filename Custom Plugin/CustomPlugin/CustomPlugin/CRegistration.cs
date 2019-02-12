@@ -9,10 +9,27 @@ namespace CustomPlugin
         public string PlayerName { get; }
         public HashWithSaltResult Hash { get; }
 
+        /// <summary>
+        /// Use this for registration of new account
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="playerName"></param>
+        /// <param name="hash"></param>
         public CRegistration(string username, string playerName, HashWithSaltResult hash)
         {
             Username = username;
             PlayerName = playerName;
+            Hash = hash;
+        }
+
+        /// <summary>
+        /// Use this for resetting of password
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="hash"></param>
+        public CRegistration(string username, HashWithSaltResult hash)
+        {
+            Username = username;
             Hash = hash;
         }
 

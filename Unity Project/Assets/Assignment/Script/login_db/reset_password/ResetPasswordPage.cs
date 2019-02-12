@@ -107,7 +107,12 @@ public class ResetPasswordPage : MonoBehaviour
     void ResetPassword()
     {
         byte evCode = (byte)EvCode.RESET_PASSWORD;
-        string[] content = { username.ToLower(), password, prevPassword };
+        //string[] content = { username.ToLower(), password, prevPassword };
+
+        EncryptPassword pw = new EncryptPassword();
+        HashWithSaltResult hash = pw.HashWithSalt(password, 64, System.Security.Cryptography.SHA256.Create());
+
+        CRegistration reset = new CRegistration(username.ToLower(), prevPassword, hash);
         bool reliable = true;
 
         bool ready = false;
@@ -124,7 +129,7 @@ public class ResetPasswordPage : MonoBehaviour
 
         // send over to the server plugin to register if password matches and every textfield is filled
         if (ready)
-            PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+            PhotonNetwork.RaiseEvent(evCode, CRegistration.Serialize(reset), reliable, null);
     }
 
     public static void ResetPasswordReceive(byte eventCode, object content, int senderID)

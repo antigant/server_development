@@ -42,7 +42,7 @@ namespace TestPlugin
             host.TryRegisterType(typeof(CVector3), (byte)'E', CVector3.Serialize, CVector3.Deserialize);
             host.TryRegisterType(typeof(CRegistration), (byte)'F', CRegistration.Serialize, CRegistration.Deserialize);
             host.TryRegisterType(typeof(CLogout), (byte)'G', CLogout.Serialize, CLogout.Deserialize);
-
+            host.TryRegisterType(typeof(CUpdateItem), (byte)'H', CUpdateItem.Serialize, CUpdateItem.Deserialize);
 
             host.TryRegisterType(typeof(Test), (byte)'1', Test.Serialize, Test.Deserialize);
 
@@ -320,8 +320,9 @@ namespace TestPlugin
 
         void ResetPassword(IRaiseEventCallInfo info)
         {
-            string[] message = (string[])info.Request.Data;
-            string sql = "SELECT * FROM account WHERE username ='" + message[0] + "'";
+            //string[] message = (string[])info.Request.Data;
+            CRegistration reset = CRegistration.Deserialize((byte[])info.Request.Data) as CRegistration;
+            string sql = "SELECT * FROM account WHERE username ='" + reset.Username + "'";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -335,20 +336,30 @@ namespace TestPlugin
             if (accExist)
             {
                 string prevPassword = "";
+                string salt = "";
                 // check previous password if correct
                 rdr = cmd.ExecuteReader();
                 while (rdr.Read())
+                {
                     prevPassword = rdr.GetString(2);
+                    salt = rdr.GetString(3);
+                }
                 rdr.Close();
 
                 // check if prev match with the user
                 bool matches = false;
-                if (prevPassword == message[2])
+
+                EncryptPassword pw = new EncryptPassword();
+                string digest = "";
+                if (salt != null)               // lazy to create new class, so using PlayerName to store prev pw
+                    digest = pw.GetDigest(reset.PlayerName, salt, System.Security.Cryptography.SHA256.Create());
+
+                if (prevPassword == digest)
                     matches = true;
                 if (matches)
                 {
                     // update the password
-                    sql = "UPDATE account SET password='" + message[1] + "' WHERE username ='" + message[0] + "'";
+                    sql = "UPDATE account SET password='" + reset.Hash.Digest + "', salt='" + reset.Hash.Salt + "' WHERE username ='" + reset.Username + "'";
                     cmd.CommandText = sql;
                     cmd.ExecuteNonQuery();
 
@@ -384,7 +395,7 @@ namespace TestPlugin
 
             // getting the data from the db
             int i = 0;
-            while (rdr.Read())
+            while (rdr.Read() && i < 9)
             {
                 itemIDs[i] = rdr.GetInt32(0);
                 ++i;
@@ -402,58 +413,59 @@ namespace TestPlugin
         void UpdateItem(IRaiseEventCallInfo info)
         {
             // index 0: message type (eg. INSERT/UPDATE), 1: account_id, 2: item id (NULL if its inserting)
-            string[] message = (string[])info.Request.Data;
+            CUpdateItem item = CUpdateItem.Deserialize((byte[])info.Request.Data) as CUpdateItem;
 
             string sql = "";
             MySqlCommand cmd;
 
-            if (message[0][0] == 'I')
+            if (item.Message[0] == 'I')
             {
-                string[] returnMessage = new string[2]
-                {
-                    message[0],
-                    "NULL",
-                };
+                //string[] returnMessage = new string[2]
+                //{
+                //    message[0],
+                //    "NULL",
+                //};
 
                 // insert into db
-                sql = "INSERT INTO item (account_id) VALUES ('" + message[1] + "')";
+                sql = "INSERT INTO item (account_id) VALUES ('" + item.AccountID + "')";
                 cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
 
                 // get the item_id and return to the player
-                sql = "SELECT * FROM item WHERE account_id='" + message[1] + "'";
+                sql = "SELECT * FROM item WHERE account_id='" + item.AccountID + "'";
                 cmd.CommandText = sql;
                 MySqlDataReader rdr = cmd.ExecuteReader();
 
+                int itemID = 0;
                 while (rdr.Read())
-                    returnMessage[1] = rdr.GetInt32(0).ToString();
+                    itemID = rdr.GetInt32(0);
                 rdr.Close();
 
                 // returns the message to the client
                 PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
                                           senderActor: 0,
                                           evCode: info.Request.EvCode,
-                                          data: new Dictionary<byte, object>() { { 245, returnMessage }, { 254, 0 } },
+                                          data: new Dictionary<byte, object>() { { 245, itemID }, { 254, 0 } },
                                           cacheOp: CacheOperations.DoNotCache);
 
                 // if the codes still run after sending message to client, return
                 return;
-            }            
-            else if(message[0][0] == 'U')
+            }
+            else if (item.Message[0] == 'U')
             {
                 // update the account_id when player drop/pick_up the item
-                sql = "UPDATE item SET account_id='" + message[3] + "' WHERE item_id='" + message[2] + "'";
+                sql = "UPDATE item SET account_id='" + item.AccountID + "' WHERE item_id='" + item.ItemID + "'";
                 cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
 
-                if (message[0][1] == '1')
+                if (item.Message[1] == '1')
                     return;
 
             }
-            else if (message[0][0] == 'D')
+            else if (item.Message[0] == 'D')
             {
                 // delete the item where item_id is the one received
-                sql = "DELETE FROM item WHERE item_id ='" + message[2] + "'";
+                sql = "DELETE FROM item WHERE item_id ='" + item.ItemID + "'";
                 cmd = new MySqlCommand(sql, conn);
                 cmd.ExecuteNonQuery();
             }

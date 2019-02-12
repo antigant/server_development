@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="CLogout.cs" />
     <Compile Include="CRegistration.cs" />
+    <Compile Include="CUpdateItem.cs" />
     <Compile Include="EncryptPassword.cs" />
     <Compile Include="General.cs" />
     <Compile Include="HashWithSaltResult.cs" />

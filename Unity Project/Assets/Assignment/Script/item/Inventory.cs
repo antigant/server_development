@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using CustomPlugin;
 
 public class Inventory : Photon.MonoBehaviour
 {
@@ -56,6 +57,8 @@ public class Inventory : Photon.MonoBehaviour
     // spawn item in inventory
     void SpawnItem()
     {
+        if (Player.GetInstance().GetItemCount() >= 9)
+            return;
         // inserting into database
         UpdateItem("INSERT"); 
     }
@@ -86,12 +89,11 @@ public class Inventory : Photon.MonoBehaviour
         if (eventCode != (byte)EvCode.UPDATE_ITEM || senderID > 0)
             return;
 
-        string[] message = (string[])content;
-        if(message[0][0] == 'I')
+        int item = (int)content;
+        if(item == 0)
         {
             // add into Player item inventory
-            int itemID = System.Convert.ToInt32(message[1]);
-            Player.GetInstance().AddItem(itemID);
+            Player.GetInstance().AddItem(item);
         }
     }
 
@@ -100,12 +102,10 @@ public class Inventory : Photon.MonoBehaviour
     {
         byte evCode = (byte)EvCode.UPDATE_ITEM;
 
-        string item_id = itemID.ToString();
-        if (itemID <= 0)
-            item_id = "NULL";
+        CUpdateItem item = new CUpdateItem(messageType, Player.GetInstance().GetAccountID(), itemID);
 
-        string[] content = { messageType, Player.GetInstance().GetAccountID().ToString(), item_id, account_id.ToString() };
+        //string[] content = { messageType, Player.GetInstance().GetAccountID().ToString(), item_id, account_id.ToString() };
         bool reliable = true;
-        PhotonNetwork.RaiseEvent(evCode, content, reliable, null);
+        PhotonNetwork.RaiseEvent(evCode, CUpdateItem.Serialize(item), reliable, null);
     }
 }
