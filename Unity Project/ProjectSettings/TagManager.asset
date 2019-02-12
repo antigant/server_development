@@ -8,6 +8,7 @@ TagManager:
   - item_drop_pos
   - item
   - marker
+  - Vision
   layers:
   - Default
   - TransparentFX
