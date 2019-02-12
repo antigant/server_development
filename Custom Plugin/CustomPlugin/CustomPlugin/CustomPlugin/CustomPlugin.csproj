@@ -49,19 +49,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLogin.cs" />
     <Compile Include="CLogout.cs" />
-    <Compile Include="CPlayer.cs" />
     <Compile Include="CRegistration.cs" />
-    <Compile Include="CSound.cs" />
-    <Compile Include="CVector3.cs" />
     <Compile Include="EncryptPassword.cs" />
     <Compile Include="General.cs" />
     <Compile Include="HashWithSaltResult.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="CLogin.cs" />
+    <Compile Include="CPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CSound.cs" />
     <Compile Include="RNG.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="CVector3.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

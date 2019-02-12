@@ -105,27 +105,28 @@ public class LoginPage : Photon.PunBehaviour
         if (eventCode != (byte)EvCode.LOGIN || senderID > 0)
             return;
 
-        string[] message = (string[])content;
+        CPlayer player = CPlayer.Deserialize((byte[])content) as CPlayer;
+
         // Successful
-        if (message[0][0] == 'S')
+        if (player.ReturnMessage[0] == 'S')
         {
             // set up relevant data for the player
-            int accountID = System.Convert.ToInt32(message[1]);
-            string playerName = message[2];
+            int accountID = player.AccountID;
+            string playerName = player.PlayerName;
             // Init the player
             Player.GetInstance(accountID, playerName, force: true);
 
             // player position
-            float pos_x = System.Convert.ToSingle(message[3]);
-            float pos_y = System.Convert.ToSingle(message[4]);
-            float pos_z = System.Convert.ToSingle(message[5]);
+            float pos_x = player.PlayerPosition.x;
+            float pos_y = player.PlayerPosition.y;
+            float pos_z = player.PlayerPosition.z;
             Vector3 pos = new Vector3(pos_x, pos_y, pos_z);
             Player.GetInstance().SetPosition(pos);
 
             // pet position
-            pos_x = System.Convert.ToSingle(message[6]);
-            pos_y = System.Convert.ToSingle(message[7]);
-            pos_z = System.Convert.ToSingle(message[8]);
+            pos_x = player.PetPosition.x;
+            pos_y = player.PetPosition.y;
+            pos_z = player.PetPosition.z;
             pos = new Vector3(pos_x, pos_y, pos_z);
             Player.GetInstance().SetPetPosition(pos);
 
@@ -139,10 +140,10 @@ public class LoginPage : Photon.PunBehaviour
             PhotonNetwork.LeaveRoom();
         }
         // Unsuccesful
-        else if(message[0][0] == 'U')
+        else if(player.ReturnMessage[0] == 'U')
         {
             // inform the player that the username/password is incorrect
-            General.Message = General.GetStringDataFromMessage(message[0], "Message");
+            General.Message = General.GetStringDataFromMessage(player.ReturnMessage, "Message");
         }
     }
 
