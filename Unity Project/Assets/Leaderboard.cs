@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using CustomPlugin;
 
 public class Leaderboard : Photon.MonoBehaviour
 {
@@ -43,9 +44,13 @@ public class Leaderboard : Photon.MonoBehaviour
     {
         if (eventCode == (byte)EvCode.LEADERBOARD)
         {
-            string[] topPlayers = (string[])content;
-            for (int i = 0; i < topPlayers.Length; ++i)
-                ldrName[i].text = topPlayers[i];
+            //string[] topPlayers = (string[])content;
+            //for (int i = 0; i < topPlayers.Length; ++i)
+            //    ldrName[i].text = topPlayers[i];
+
+            CLeaderboard ldr = CLeaderboard.Deserialize((byte[])content) as CLeaderboard;
+            for (int i = 0; i < ldr.TopPlayers.Length; ++i)
+                ldrName[i].text = ldr.TopPlayers[i];
         }
     }
 }

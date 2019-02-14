@@ -17,8 +17,9 @@ public class Changeofvision : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         timer = -1.0f * Time.deltaTime;
+        visualGridSize.gameObject.transform.rotation = Quaternion.identity;
         //Key Input
-		if(Input.GetKeyDown(KeyCode.P) && zoomin == false && timer < 0)
+        if (Input.GetKeyDown(KeyCode.P) && zoomin == false && timer < 0)
         {
             zoomin = true;
             timer = 1;

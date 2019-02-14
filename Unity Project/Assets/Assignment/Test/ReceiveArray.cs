@@ -21,7 +21,7 @@ public class ReceiveArray : Photon.PunBehaviour
         //    PhotonNetwork.JoinOrCreateRoom("InitServer", options, TypedLobby.Default);
         //}
 
-        PhotonNetwork.OnEventCall += TestReceive;
+        //PhotonNetwork.OnEventCall += TestReceive;
     }
 
     private void Update()

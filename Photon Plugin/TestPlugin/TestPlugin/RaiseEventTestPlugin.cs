@@ -44,6 +44,7 @@ namespace TestPlugin
             host.TryRegisterType(typeof(CLogout), (byte)'G', CLogout.Serialize, CLogout.Deserialize);
             host.TryRegisterType(typeof(CUpdateItem), (byte)'H', CUpdateItem.Serialize, CUpdateItem.Deserialize);
             host.TryRegisterType(typeof(CAchievements), (byte)'I', CAchievements.Serialize, CAchievements.Deserialize);
+            host.TryRegisterType(typeof(CLeaderboard), (byte)'J', CLeaderboard.Serialize, CLeaderboard.Deserialize);
 
             host.TryRegisterType(typeof(Test), (byte)'1', Test.Serialize, Test.Deserialize);
 
@@ -98,7 +99,7 @@ namespace TestPlugin
                     }
                 case (byte)EvCode.LEADERBOARD:
                     {
-
+                        Leaderboard(info);
                         break;
                     }
                 case (byte)EvCode.PHOTON_TEST:
@@ -508,8 +509,8 @@ namespace TestPlugin
             {
                 float[] temp = new float[2]
                 {
-                                    rdr.GetInt32(0),
-                                    rdr.GetFloat(5),
+                    rdr.GetInt32(0),
+                    rdr.GetFloat(5),
                 };
                 score[i] = temp;
                 ++i;
@@ -556,11 +557,12 @@ namespace TestPlugin
                 rdr.Close();
             }
 
+            CLeaderboard ldr = new CLeaderboard(topPlayers);
             PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
-                                                  senderActor: 0,
-                                                  evCode: info.Request.EvCode,
-                                                  data: new Dictionary<byte, object>() { { 245, topPlayers }, { 254, 0 } },
-                                                  cacheOp: CacheOperations.DoNotCache);
+                                                              senderActor: 0,
+                                                              evCode: info.Request.EvCode,
+                                                              data: new Dictionary<byte, object>() { { 245, ldr }, { 254, 0 } },
+                                                              cacheOp: CacheOperations.DoNotCache);
         }
 
         // ----- Open connection to 
@@ -888,3 +890,77 @@ namespace TestPlugin
 //                                      evCode: info.Request.EvCode,
 //                                      data: new Dictionary<byte, object>() { { 245, player }, { 254, 0 } },
 //                                      cacheOp: CacheOperations.DoNotCache);
+
+//// using this to store the top players 
+//string[] topPlayers = new string[3];
+
+//// getting the number of players in the db
+//string sql = "SELECT COUNT('account_id') FROM player";
+//MySqlCommand cmd = new MySqlCommand(sql, conn);
+//int count = Convert.ToInt32(cmd.ExecuteScalar().ToString());
+
+//float[][] score = new float[count][];
+
+//sql = "SELECT * FROM player";
+//            cmd.CommandText = sql;
+//            MySqlDataReader rdr = cmd.ExecuteReader();
+
+//int i = 0;
+//            while (rdr.Read())
+//            {
+//                float[] temp = new float[2]
+//                {
+//                                    rdr.GetInt32(0),
+//                                    rdr.GetFloat(5),
+//                };
+//score[i] = temp;
+//                ++i;
+//            }
+//            rdr.Close();
+
+//            float[] tempScore = new float[count];
+//            for (int j = 0; j<count; ++j)
+//                tempScore[j] = score[j][1];
+
+//            // sort from small to big
+//            Array.Sort(tempScore);
+
+//            // making it decending (big to small)
+//            Array.Reverse(tempScore);
+
+//            float[] topScore = new float[3];
+//            for (int j = 0; j<topScore.Length; ++j)
+//                topScore[j] = tempScore[j];
+
+//            int[] account_id = new int[3];
+//i = 0;
+//            for (int y = 0; y<count; ++y)
+//            {
+//                for (int x = 0; x<topScore.Length; ++x)
+//                {
+//                    if (topScore[y] != score[x][1])
+//                        continue;
+
+//                    account_id[i] = (int) score[x][0];
+//                    ++i;
+//                    break;
+//                }
+//            }
+
+//            for (i = 0; i< 3; ++i)
+//            {
+//                sql = "SELECT * FROM player WHERE account_id ='" + account_id[i] + "'";
+//                cmd.CommandText = sql;
+//                rdr = cmd.ExecuteReader();
+
+//                while (rdr.Read())
+//                    topPlayers[i] = rdr.GetString(1);
+//                rdr.Close();
+//            }
+
+//            CLeaderboard ldr = new CLeaderboard(topPlayers);
+//PluginHost.BroadcastEvent(recieverActors: new List<int>() { { info.ActorNr } },
+//                                                  senderActor: 0,
+//                                                  evCode: info.Request.EvCode,
+//                                                  data: new Dictionary<byte, object>() { { 245, ldr }, { 254, 0 } },
+//                                                  cacheOp: CacheOperations.DoNotCache);

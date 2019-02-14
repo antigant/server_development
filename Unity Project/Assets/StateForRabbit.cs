@@ -58,7 +58,7 @@ public class StateForRabbit : MonoBehaviour
         //}
 
         //chase
-        if ((Player.transform.position - transform.position).sqrMagnitude < 50.0f && (Player.transform.position - transform.position).sqrMagnitude > DistanceBetweenPlayer)
+        if ((Player.transform.position - transform.position).sqrMagnitude < 25.0f && (Player.transform.position - transform.position).sqrMagnitude > DistanceBetweenPlayer)
         {
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Attack") && currState == "Attack")
             {

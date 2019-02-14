@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WeatherSystem : MonoBehaviour {
+public class WeatherSystem : Photon.MonoBehaviour {
+
+    bool appliedInitialUpdate;
+    int correctWeather;
 
     public GameObject[] listofWeathers;
     public int currentWeatherNo;
@@ -23,14 +26,20 @@ public class WeatherSystem : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
-        timer += 1.0f * Time.deltaTime;
-        //Save currentweatherNo to connection;
-        if (timer > 10)
+        if (!PhotonNetwork.isMasterClient)
+            currentWeatherNo = correctWeather;
+        else
         {
-            timer = 0;
-       
-            currentWeatherNo = Random.Range(0,3);
+            timer += 1.0f * Time.deltaTime;
+            //Save currentweatherNo to connection;
+            if (timer > 10)
+            {
+                timer = 0;
+
+                currentWeatherNo = Random.Range(0, 3);
+            }
         }
+
         if (currentWeatherNo == 0 || currentWeatherNo == 3)
         {//Stop all weather , if its 0 means its clear weather
             listofWeathers[1].SetActive(false);
@@ -47,6 +56,26 @@ public class WeatherSystem : MonoBehaviour {
             listofWeathers[2].SetActive(true);
             listofWeathers[1].SetActive(false);
         }
+    }
 
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            //We own this player: send the others our data
+            // stream.SendNext((int)controllerScript._characterState);
+            stream.SendNext(currentWeatherNo);
+
+        }
+        else
+        {
+            correctWeather = (int)stream.ReceiveNext();
+
+            if (!appliedInitialUpdate)
+            {
+                appliedInitialUpdate = true;
+                currentWeatherNo = correctWeather;
+            }
+        }
     }
 }
